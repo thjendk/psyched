@@ -1,33 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Switch, Route } from 'react-router-dom';
-import Login from './components/auth/Login';
 import Frontpage from './components/Frontpage';
-import Register from './components/auth/Register';
-import Logout from './components/auth/Logout';
 import Layout from 'components/layout/Layout';
-import User from 'classes/User';
 import './App.scss';
+import Login from 'components/auth/Login';
+import Logout from 'components/auth/Logout';
 
 export interface AppProps {}
 
 const App: React.FC<AppProps> = () => {
-  const [fetching, setFetching] = useState(true);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      await User.fetch();
-      setFetching(false);
-    };
-
-    fetchUser();
-  }, []);
-
   return (
     <div>
       <Layout>
         <Switch>
-          {fetching && <p>Loading...</p>}
-          <Route path="/register" component={Register} />
           <Route path="/logout" component={Logout} />
           <Route path="/login" component={Login} />
           <Route path="/" component={Frontpage} />

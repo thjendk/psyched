@@ -17,6 +17,14 @@ export enum CacheControlScope {
   Private = 'PRIVATE'
 }
 
+export type Diagnosis = {
+   __typename?: 'Diagnosis';
+  id?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  symptoms?: Maybe<Array<Maybe<Symptom>>>;
+};
+
 export type Mutation = {
    __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']>;
@@ -39,6 +47,15 @@ export type Query = {
    __typename?: 'Query';
   _empty?: Maybe<Scalars['String']>;
   user?: Maybe<User>;
+  diagnoses?: Maybe<Array<Maybe<Diagnosis>>>;
+  symptoms?: Maybe<Array<Maybe<Symptom>>>;
+};
+
+export type Symptom = {
+   __typename?: 'Symptom';
+  id?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
 };
 
 
@@ -133,6 +150,8 @@ export type ResolversTypes = ResolversObject<{
   String: ResolverTypeWrapper<Partial<Scalars['String']>>,
   User: ResolverTypeWrapper<Partial<User>>,
   Int: ResolverTypeWrapper<Partial<Scalars['Int']>>,
+  Diagnosis: ResolverTypeWrapper<Partial<Diagnosis>>,
+  Symptom: ResolverTypeWrapper<Partial<Symptom>>,
   Mutation: ResolverTypeWrapper<{}>,
   UserInput: ResolverTypeWrapper<Partial<UserInput>>,
   Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']>>,
@@ -146,11 +165,21 @@ export type ResolversParentTypes = ResolversObject<{
   String: Partial<Scalars['String']>,
   User: Partial<User>,
   Int: Partial<Scalars['Int']>,
+  Diagnosis: Partial<Diagnosis>,
+  Symptom: Partial<Symptom>,
   Mutation: {},
   UserInput: Partial<UserInput>,
   Boolean: Partial<Scalars['Boolean']>,
   CacheControlScope: Partial<CacheControlScope>,
   Upload: Partial<Scalars['Upload']>,
+}>;
+
+export type DiagnosisResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Diagnosis'] = ResolversParentTypes['Diagnosis']> = ResolversObject<{
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  symptoms?: Resolver<Maybe<Array<Maybe<ResolversTypes['Symptom']>>>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
@@ -163,6 +192,15 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   _empty?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>,
+  diagnoses?: Resolver<Maybe<Array<Maybe<ResolversTypes['Diagnosis']>>>, ParentType, ContextType>,
+  symptoms?: Resolver<Maybe<Array<Maybe<ResolversTypes['Symptom']>>>, ParentType, ContextType>,
+}>;
+
+export type SymptomResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Symptom'] = ResolversParentTypes['Symptom']> = ResolversObject<{
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
 
 export interface UploadScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Upload'], any> {
@@ -177,8 +215,10 @@ export type UserResolvers<ContextType = Context, ParentType extends ResolversPar
 }>;
 
 export type Resolvers<ContextType = Context> = ResolversObject<{
+  Diagnosis?: DiagnosisResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
+  Symptom?: SymptomResolvers<ContextType>,
   Upload?: GraphQLScalarType,
   User?: UserResolvers<ContextType>,
 }>;

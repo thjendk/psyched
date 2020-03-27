@@ -5,3 +5,13 @@ export const MainLayout = styled.div`
   flex-direction: column;
   height: 100vh;
 `;
+
+export const ContentContainer = styled.div`
+  margin: 1em auto;
+  width: 100%;
+  max-width: 1200px;
+
+  @media only screen and (max-width: 600px) {
+    margin-top: 0;
+  }
+`;

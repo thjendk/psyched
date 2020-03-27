@@ -21,8 +21,15 @@ class User {
       }
     `;
 
-    const user = await Apollo.query<User>('user', query);
-    store.dispatch(authReducer.actions.login(user));
+    try {
+      store.dispatch(authReducer.actions.setStatus('loading'));
+      const user = await Apollo.query<User>('user', query);
+      store.dispatch(authReducer.actions.login(user));
+      store.dispatch(authReducer.actions.setStatus(null));
+    } catch (err) {
+      console.error(err);
+      store.dispatch(authReducer.actions.setStatus('error'));
+    }
   };
 
   /**

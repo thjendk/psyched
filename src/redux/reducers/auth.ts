@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import User from 'classes/User';
 
-const initialState = { user: null as User | null };
+export type LoadingType = 'success' | 'loading' | 'error' | 'idle';
+const initialState = { user: null as User | null, status: 'idle' as LoadingType };
 
 const authReducer = createSlice({
   name: 'auth',
@@ -12,6 +13,9 @@ const authReducer = createSlice({
     },
     logout: (state) => {
       state.user = null;
+    },
+    setStatus: (state, action: PayloadAction<LoadingType>) => {
+      state.status = action.payload;
     }
   }
 });

@@ -1,13 +1,15 @@
 import React from 'react';
-import { LargeText, CenterText } from 'styles/text';
+import DiagnosisTable from './DiagnosisTable';
+import SymptomPicker from './SymptomPicker';
 
 export interface FrontpageProps {}
 
 const Frontpage: React.FC<FrontpageProps> = () => {
   return (
-    <CenterText>
-      <LargeText>This is the frontpage</LargeText>
-    </CenterText>
+    <div>
+      <SymptomPicker />
+      <DiagnosisTable />
+    </div>
   );
 };
 

@@ -15,6 +15,14 @@ export enum CacheControlScope {
   Private = 'PRIVATE'
 }
 
+export type Diagnosis = {
+   __typename?: 'Diagnosis';
+  id?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  symptoms?: Maybe<Array<Maybe<Symptom>>>;
+};
+
 export type Mutation = {
    __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']>;
@@ -37,6 +45,15 @@ export type Query = {
    __typename?: 'Query';
   _empty?: Maybe<Scalars['String']>;
   user?: Maybe<User>;
+  diagnoses?: Maybe<Array<Maybe<Diagnosis>>>;
+  symptoms?: Maybe<Array<Maybe<Symptom>>>;
+};
+
+export type Symptom = {
+   __typename?: 'Symptom';
+  id?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
 };
 
 
