@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { LoadingType } from './auth';
 import { Symptom } from 'types/generated';
+import { insertOrReplace } from 'redux/misc/utilityFunctions';
 
 const initialState = {
   status: 'idle' as LoadingType,
@@ -18,7 +19,10 @@ const symptomReducer = createSlice({
     setStatus: (state, action: PayloadAction<LoadingType>) => {
       state.status = action.payload;
     },
-    addSymptom: (state, action: PayloadAction<number>) => {
+    addSymptom: (state, action: PayloadAction<Symptom>) => {
+      insertOrReplace(state.symptoms, action.payload);
+    },
+    addSymptomId: (state, action: PayloadAction<number>) => {
       const index = state.selectedIds.findIndex((id) => id === action.payload);
       console.log(index);
       if (index !== -1) {

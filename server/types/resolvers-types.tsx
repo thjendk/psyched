@@ -25,12 +25,23 @@ export type Diagnosis = {
   symptoms?: Maybe<Array<Maybe<Symptom>>>;
 };
 
+export type DiagnosisInput = {
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+};
+
 export type Mutation = {
    __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']>;
   createUser?: Maybe<Scalars['String']>;
   login?: Maybe<Scalars['String']>;
   logout?: Maybe<Scalars['String']>;
+  createDiagnosis?: Maybe<Diagnosis>;
+  updateDiagnosis?: Maybe<Diagnosis>;
+  addSymptomToDiagnosis?: Maybe<Diagnosis>;
+  removeSymptomFromDiagnosis?: Maybe<Diagnosis>;
+  createSymptom?: Maybe<Symptom>;
+  updateSymptom?: Maybe<Symptom>;
 };
 
 
@@ -41,6 +52,40 @@ export type MutationCreateUserArgs = {
 
 export type MutationLoginArgs = {
   data?: Maybe<UserInput>;
+};
+
+
+export type MutationCreateDiagnosisArgs = {
+  data?: Maybe<DiagnosisInput>;
+};
+
+
+export type MutationUpdateDiagnosisArgs = {
+  id?: Maybe<Scalars['Int']>;
+  data?: Maybe<DiagnosisInput>;
+};
+
+
+export type MutationAddSymptomToDiagnosisArgs = {
+  diagnosisId?: Maybe<Scalars['Int']>;
+  symptomId?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationRemoveSymptomFromDiagnosisArgs = {
+  diagnosisId?: Maybe<Scalars['Int']>;
+  symptomId?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationCreateSymptomArgs = {
+  data?: Maybe<SymptomInput>;
+};
+
+
+export type MutationUpdateSymptomArgs = {
+  id?: Maybe<Scalars['Int']>;
+  data?: Maybe<SymptomInput>;
 };
 
 export type Query = {
@@ -54,6 +99,11 @@ export type Query = {
 export type Symptom = {
    __typename?: 'Symptom';
   id?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+};
+
+export type SymptomInput = {
   name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
 };
@@ -154,6 +204,8 @@ export type ResolversTypes = ResolversObject<{
   Symptom: ResolverTypeWrapper<Partial<Symptom>>,
   Mutation: ResolverTypeWrapper<{}>,
   UserInput: ResolverTypeWrapper<Partial<UserInput>>,
+  DiagnosisInput: ResolverTypeWrapper<Partial<DiagnosisInput>>,
+  SymptomInput: ResolverTypeWrapper<Partial<SymptomInput>>,
   Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']>>,
   CacheControlScope: ResolverTypeWrapper<Partial<CacheControlScope>>,
   Upload: ResolverTypeWrapper<Partial<Scalars['Upload']>>,
@@ -169,6 +221,8 @@ export type ResolversParentTypes = ResolversObject<{
   Symptom: Partial<Symptom>,
   Mutation: {},
   UserInput: Partial<UserInput>,
+  DiagnosisInput: Partial<DiagnosisInput>,
+  SymptomInput: Partial<SymptomInput>,
   Boolean: Partial<Scalars['Boolean']>,
   CacheControlScope: Partial<CacheControlScope>,
   Upload: Partial<Scalars['Upload']>,
@@ -187,6 +241,12 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   createUser?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, never>>,
   login?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationLoginArgs, never>>,
   logout?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  createDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationCreateDiagnosisArgs, never>>,
+  updateDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationUpdateDiagnosisArgs, never>>,
+  addSymptomToDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationAddSymptomToDiagnosisArgs, never>>,
+  removeSymptomFromDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationRemoveSymptomFromDiagnosisArgs, never>>,
+  createSymptom?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType, RequireFields<MutationCreateSymptomArgs, never>>,
+  updateSymptom?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType, RequireFields<MutationUpdateSymptomArgs, never>>,
 }>;
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{

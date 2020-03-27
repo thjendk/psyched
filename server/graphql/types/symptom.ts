@@ -7,8 +7,18 @@ export const typeDefs = gql`
     symptoms: [Symptom]
   }
 
+  extend type Mutation {
+    createSymptom(data: SymptomInput): Symptom
+    updateSymptom(id: Int, data: SymptomInput): Symptom
+  }
+
   type Symptom {
     id: Int
+    name: String
+    description: String
+  }
+
+  input SymptomInput {
     name: String
     description: String
   }
@@ -19,6 +29,19 @@ export const resolvers: Resolvers = {
     symptoms: async () => {
       const symptoms = await Symptoms.query();
       return symptoms.map((s) => ({ id: s.symptomId }));
+    }
+  },
+
+  Mutation: {
+    createSymptom: async (root, { data }) => {
+      const symptom = await Symptoms.query().insertAndFetch(data);
+      return { id: symptom.symptomId };
+    },
+    updateSymptom: async (root, { id, data }) => {
+      const symptom = await Symptoms.query()
+        .updateAndFetchById(id, data)
+        .skipUndefined();
+      return { id: symptom.symptomId };
     }
   },
 

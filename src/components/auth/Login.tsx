@@ -3,7 +3,6 @@ import { Segment, Form, Divider, Message } from 'semantic-ui-react';
 import { useHistory } from 'react-router-dom';
 import { Formik, FormikValues } from 'formik';
 import User from 'classes/User';
-import { Button } from 'semantic-ui-react';
 
 export interface LoginProps {}
 
@@ -80,9 +79,6 @@ const Login: React.FC<LoginProps> = () => {
             </Form>
           )}
         </Formik>
-        <Button size="small" basic onClick={() => history.push('/register')}>
-          Register
-        </Button>
         {errorMessage && <Message color="red">{errorMessage}</Message>}
       </Segment>
     </div>

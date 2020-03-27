@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import Frontpage from './components/Frontpage';
 import Layout from 'components/layout/Layout';
-import './App.scss';
 import Login from 'components/auth/Login';
 import Logout from 'components/auth/Logout';
+import './App.scss';
+import User from 'classes/User';
 
 export interface AppProps {}
 
+// eslint-disable-next-line no-extend-native
+String.prototype.toTitleCase = function() {
+  return this[0].toUpperCase() + this.substr(1);
+};
+
 const App: React.FC<AppProps> = () => {
+  useEffect(() => {
+    User.fetch();
+  });
+
   return (
     <div>
       <Layout>

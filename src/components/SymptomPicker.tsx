@@ -20,11 +20,11 @@ const SymptomPicker: React.SFC<SymptomPickerProps> = () => {
 
   if (!symptoms) return <LoadingPage />;
   return (
-    <Grid stackable columns="equal" divided>
+    <Grid stackable columns="equal">
       <Grid.Column>
         <Segment>
           <p>Alle symptomer</p>
-          <SymptomPickerBox symptoms={symptoms} />
+          <SymptomPickerBox all symptoms={symptoms} />
         </Segment>
       </Grid.Column>
       <Grid.Column>

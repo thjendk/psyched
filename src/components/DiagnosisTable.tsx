@@ -25,7 +25,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
 
   if (!diagnoses) return <LoadingPage />;
   return (
-    <Table celled>
+    <Table celled size="small">
       <Table.Header>
         <Table.HeaderCell>Diagnose</Table.HeaderCell>
         <Table.HeaderCell>Beskrivelse</Table.HeaderCell>

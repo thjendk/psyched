@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { LoadingType } from './auth';
 import { Diagnosis } from 'types/generated';
+import { insertOrReplace } from 'redux/misc/utilityFunctions';
 
 const initialState = {
   status: 'idle' as LoadingType,
@@ -13,6 +14,9 @@ const diagnosisReducer = createSlice({
   reducers: {
     setDiagnoses: (state, action: PayloadAction<Diagnosis[]>) => {
       state.diagnoses = action.payload;
+    },
+    addDiagnosis: (state, action: PayloadAction<Diagnosis>) => {
+      insertOrReplace(state.diagnoses, action.payload);
     },
     setStatus: (state, action: PayloadAction<LoadingType>) => {
       state.status = action.payload;
