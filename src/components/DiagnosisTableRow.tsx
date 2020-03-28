@@ -150,7 +150,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
           </div>
         </Table.Cell>
         <Table.Cell>
-          {pickedSymptoms.length} / {diagnosis.symptoms.length}
+          {pickedSymptoms.length} / {symptoms.length}
         </Table.Cell>
         {user && (
           <Table.Cell>

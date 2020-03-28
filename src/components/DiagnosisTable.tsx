@@ -16,8 +16,20 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
 
   const sorter = (a: Diagnosis, b: Diagnosis) => {
     return (
-      b.symptoms.filter((s) => symptomIds.includes(s.id)).length -
-      a.symptoms.filter((s) => symptomIds.includes(s.id)).length
+      b.symptoms
+        .concat(
+          diagnoses
+            .filter((d) => d.children.map((p) => p.id).includes(b.id))
+            .flatMap((d) => d.symptoms)
+        )
+        .filter((s) => symptomIds.includes(s.id)).length -
+      a.symptoms
+        .concat(
+          diagnoses
+            .filter((d) => d.children.map((p) => p.id).includes(a.id))
+            .flatMap((d) => d.symptoms)
+        )
+        .filter((s) => symptomIds.includes(s.id)).length
     );
   };
 
