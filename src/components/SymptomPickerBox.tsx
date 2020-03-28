@@ -26,7 +26,7 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
   };
 
   return (
-    <div style={{ overflowY: 'auto' }}>
+    <div>
       <Input
         fluid
         value={search}
@@ -34,22 +34,24 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
         placeholder="Søg..."
       />
       <Divider />
-      {symptoms
-        .slice()
-        .sort(sorter)
-        .map((s) => <SymptomPickerRow symptom={s} search={search} />)
-        .concat(
-          all &&
-            (adding ? (
-              <SymptomPickerInput setAdding={setAdding} />
-            ) : (
-              user && (
-                <SymptomPickerRowContainer onClick={() => setAdding(true)}>
-                  + Tilføj symptom...
-                </SymptomPickerRowContainer>
-              )
-            ))
-        )}
+      <div style={{ overflowY: 'auto', height: '30vh' }}>
+        {symptoms
+          .slice()
+          .sort(sorter)
+          .map((s) => <SymptomPickerRow symptom={s} search={search} />)
+          .concat(
+            all &&
+              (adding ? (
+                <SymptomPickerInput setAdding={setAdding} />
+              ) : (
+                user && (
+                  <SymptomPickerRowContainer onClick={() => setAdding(true)}>
+                    + Tilføj symptom...
+                  </SymptomPickerRowContainer>
+                )
+              ))
+          )}
+      </div>
     </div>
   );
 };
