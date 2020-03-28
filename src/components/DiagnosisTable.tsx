@@ -25,7 +25,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
 
     if (percentage(a) < percentage(b)) return 1;
     if (percentage(a) > percentage(b)) return -1;
-    return 0;
+    return a.icdCode.localeCompare(b.icdCode);
   };
 
   useEffect(() => {
