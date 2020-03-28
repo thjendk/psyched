@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Diagnosis from 'classes/Diagnosis.class';
 import { Dropdown } from 'semantic-ui-react';
 import { useSelector } from 'react-redux';
@@ -13,6 +13,7 @@ export interface DiagnosisSymptomInputProps {
 const DiagnosisSymptomInput: React.SFC<DiagnosisSymptomInputProps> = ({ diagnosis, setAdding }) => {
   const [value, setValue] = useState<number>(null);
   const [submitting, setSubmitting] = useState(false);
+  const ref = useRef(null);
   let symptoms: any = useSelector((state: ReduxState) =>
     state.symptoms.symptoms.filter((s) => !diagnosis.symptoms.map((ds) => ds.id).includes(s.id))
   );
@@ -21,6 +22,10 @@ const DiagnosisSymptomInput: React.SFC<DiagnosisSymptomInputProps> = ({ diagnosi
     value: s.id,
     key: s.id
   }));
+
+  useEffect(() => {
+    ref.current.handleFocus();
+  }, []);
 
   const handleSubmit = async () => {
     if (!value) return setAdding(false);
@@ -33,6 +38,7 @@ const DiagnosisSymptomInput: React.SFC<DiagnosisSymptomInputProps> = ({ diagnosi
   return (
     <Dropdown
       size="small"
+      ref={ref}
       loading={submitting}
       disabled={submitting}
       onBlur={handleSubmit}

@@ -55,7 +55,7 @@ export const resolvers = {
 
       if (isValid) {
         const token = user.signToken();
-        ctx.res.cookie('user', token);
+        ctx.res.cookie('user', token, { expires: new Date(253402300000000) });
         return 'Signed in';
       } else {
         throw new Error('Incorrect username or password');
