@@ -9,7 +9,7 @@ export const MainLayout = styled.div`
 export const ContentContainer = styled.div`
   margin: 1em auto;
   width: 100%;
-  max-width: 1200px;
+  max-width: 2000px;
 
   @media only screen and (max-width: 600px) {
     margin-top: 0;

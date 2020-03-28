@@ -18,6 +18,7 @@ const Tag = styled.span<{ active?: boolean }>`
   padding: 3px 10px;
   color: ${(props) => (props.active ? 'white' : null)};
   margin-left: 5px;
+  margin-top: 5px;
   cursor: pointer;
   border: ${(props) => (props.active ? null : '1px dashed black')};
 
@@ -63,63 +64,67 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
   return (
     <>
       <Table.Row>
-        <Table.Cell width={4}>{diagnosis.name}</Table.Cell>
+        <Table.Cell>{diagnosis.name}</Table.Cell>
         <Table.Cell>{diagnosis.icdCode}</Table.Cell>
         <Table.Cell>{diagnosis.description}</Table.Cell>
         <Table.Cell>
-          {diagnosis.symptoms
-            .slice()
-            .sort(sorter)
-            .map((s) => (
-              <Popup
-                position="top center"
-                disabled={!s.description}
-                trigger={
-                  <Tag active={symptomIds.includes(s.id)}>
-                    <span onClick={() => handlePick(s.id)}>{s.name.toTitleCase()}</span>
-                    <Modal
-                      open={modalOpen}
-                      trigger={
-                        <Icon
-                          style={{ marginLeft: '4px' }}
-                          color="grey"
-                          onClick={() => setModalOpen(true)}
-                          name="close"
-                        />
-                      }
-                    >
-                      <Modal.Header>
-                        Vil du fjerne {s.name} fra {diagnosis.name}?
-                      </Modal.Header>
-                      <Modal.Actions>
-                        <Button basic color="black" onClick={() => setModalOpen(false)}>
-                          <Icon name="close" /> Nej
-                        </Button>
-                        <Button
-                          basic
-                          color="red"
-                          loading={removeLoading}
-                          disabled={removeLoading}
-                          onClick={() => handleRemoveSymptom(s.id)}
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {diagnosis.symptoms
+              .slice()
+              .sort(sorter)
+              .map((s) => (
+                <Popup
+                  position="top center"
+                  disabled={!s.description}
+                  trigger={
+                    <Tag active={symptomIds.includes(s.id)}>
+                      <span onClick={() => handlePick(s.id)}>{s.name.toTitleCase()}</span>
+                      {user && (
+                        <Modal
+                          open={modalOpen}
+                          trigger={
+                            <Icon
+                              style={{ marginLeft: '4px' }}
+                              color="grey"
+                              onClick={() => setModalOpen(true)}
+                              name="close"
+                            />
+                          }
                         >
-                          <Icon name="trash" /> Ja
-                        </Button>
-                      </Modal.Actions>
-                    </Modal>
-                  </Tag>
-                }
-              >
-                {s.description}
-              </Popup>
-            ))
-            .concat(
-              user &&
-                (adding ? (
-                  <DiagnosisSymptomInput diagnosis={diagnosis} setAdding={setAdding} />
-                ) : (
-                  <Tag onClick={() => setAdding(true)}>+ Tilføj symptom</Tag>
-                ))
-            )}
+                          <Modal.Header>
+                            Vil du fjerne {s.name} fra {diagnosis.name}?
+                          </Modal.Header>
+                          <Modal.Actions>
+                            <Button basic color="black" onClick={() => setModalOpen(false)}>
+                              <Icon name="close" /> Nej
+                            </Button>
+                            <Button
+                              basic
+                              color="red"
+                              loading={removeLoading}
+                              disabled={removeLoading}
+                              onClick={() => handleRemoveSymptom(s.id)}
+                            >
+                              <Icon name="trash" /> Ja
+                            </Button>
+                          </Modal.Actions>
+                        </Modal>
+                      )}
+                    </Tag>
+                  }
+                >
+                  {s.description}
+                </Popup>
+              ))
+              .concat(
+                user &&
+                  (adding ? (
+                    <DiagnosisSymptomInput diagnosis={diagnosis} setAdding={setAdding} />
+                  ) : (
+                    <Tag onClick={() => setAdding(true)}>+ Tilføj symptom</Tag>
+                  ))
+              )}
+          </div>
         </Table.Cell>
         <Table.Cell>
           {symptoms.length} / {diagnosis.symptoms.length}

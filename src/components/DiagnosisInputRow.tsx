@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Input, Button } from 'semantic-ui-react';
+import { Table, Input, Button, TextArea } from 'semantic-ui-react';
 import Diagnosis from 'classes/Diagnosis.class';
 
 export interface DiagnosisInputRowProps {
@@ -39,11 +39,11 @@ const DiagnosisInputRow: React.SFC<DiagnosisInputRowProps> = ({ diagnosis, setEd
         />
       </Table.Cell>
       <Table.Cell>
-        <Input
+        <TextArea
           placeholder="Beskrivelse"
-          fluid
+          style={{ width: '100%' }}
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e, { value }) => setDescription(value as string)}
         />
       </Table.Cell>
       <Table.Cell />

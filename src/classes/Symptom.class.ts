@@ -59,7 +59,19 @@ class Symptom {
     }
   };
 
-  static update = async (id: number, data: SymptomInput) => {};
+  static update = async (id: number, data: SymptomInput) => {
+    const mutation = gql`
+      mutation UpdateSymptom($id: Int, $data: SymptomInput) {
+        updateSymptom(id: $id, data: $data) {
+          ...Symptom
+        }
+      }
+      ${Symptom.fragment}
+    `;
+
+    const symptom = await Apollo.mutate<Symptom>('updateSymptom', mutation, { id, data });
+    store.dispatch(symptomReducer.actions.addSymptom(symptom));
+  };
 
   static remove = async (id: number) => {
     const mutation = gql`

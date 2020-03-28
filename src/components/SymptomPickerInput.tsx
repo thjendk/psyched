@@ -1,27 +1,44 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Input, Button } from 'semantic-ui-react';
+import { Input, Button, TextArea } from 'semantic-ui-react';
 import styled from 'styled-components';
 import Symptom from 'classes/Symptom.class';
 
 export interface SymptomPickerInputProps {
-  setAdding: Function;
+  setAdding?: Function;
+  setEditing?: Function;
+  symptom?: Symptom;
 }
 
 const BoxContainer = styled.div`
   border: 1px solid grey;
 `;
 
-const SymptomPickerInput: React.SFC<SymptomPickerInputProps> = ({ setAdding }) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+const SymptomPickerInput: React.SFC<SymptomPickerInputProps> = ({
+  setAdding,
+  symptom,
+  setEditing
+}) => {
+  const [name, setName] = useState(symptom?.name || '');
+  const [description, setDescription] = useState(symptom?.description || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const ref = useRef(null);
 
   const handleSubmit = async () => {
     if (!name) return setAdding(false);
     setIsSubmitting(true);
-    await Symptom.create({ name: name.toLowerCase(), description });
+    if (!!symptom) {
+      await Symptom.update(symptom.id, { name, description });
+      setEditing(false);
+    } else {
+      await Symptom.create({ name: name.toLowerCase(), description });
+      setAdding(false);
+    }
+
     setIsSubmitting(false);
+  };
+
+  const handleCancel = () => {
+    if (!!symptom) return setEditing(false);
     setAdding(false);
   };
 
@@ -38,11 +55,11 @@ const SymptomPickerInput: React.SFC<SymptomPickerInputProps> = ({ setAdding }) =
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
-      <Input
-        fluid
+      <TextArea
+        style={{ width: '100%' }}
         placeholder="Beskrivelse"
         value={description}
-        onChange={(e) => setDescription(e.target.value)}
+        onChange={(e, { value }) => setDescription(value as string)}
       />
       <div style={{ display: 'flex' }}>
         <Button
@@ -53,9 +70,9 @@ const SymptomPickerInput: React.SFC<SymptomPickerInputProps> = ({ setAdding }) =
           color="blue"
           onClick={handleSubmit}
         >
-          Tilføj
+          {!!symptom ? 'Rediger' : 'Tilføj'}
         </Button>
-        <Button basic color="black" onClick={() => setAdding(false)}>
+        <Button basic color="black" onClick={handleCancel}>
           Annuller
         </Button>
       </div>

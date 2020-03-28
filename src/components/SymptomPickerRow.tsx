@@ -3,6 +3,9 @@ import styled from 'styled-components';
 import Highlight from 'react-highlighter';
 import { Loader, Icon } from 'semantic-ui-react';
 import Symptom from 'classes/Symptom.class';
+import { useSelector } from 'react-redux';
+import { ReduxState } from 'redux/reducers';
+import SymptomPickerInput from './SymptomPickerInput';
 
 export const SymptomPickerRowContainer = styled.p`
   border: 1px solid lightgrey;
@@ -26,7 +29,9 @@ export interface SymptomPickerRowProps {
 }
 
 const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom }) => {
+  const user = useSelector((state: ReduxState) => state.auth.user);
   const [removing, setRemoving] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   const handleRemove = async (id: number) => {
     setRemoving(true);
@@ -38,25 +43,31 @@ const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom })
     Symptom.pick(id);
   };
 
+  if (editing) return <SymptomPickerInput symptom={symptom} setEditing={setEditing} />;
   return (
     <SymptomPickerRowContainer>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <div onClick={() => handlePick(symptom.id)}>
           <Highlight search={search}>{symptom.name.toTitleCase()}</Highlight>
           {symptom.description && (
-            <span>
-              {' '}
-              <Highlight search={search}>({symptom.description})</Highlight>
-            </span>
+            <>
+              <br />
+              <Highlight style={{ color: 'grey' }} search={search}>
+                {symptom.description}
+              </Highlight>
+            </>
           )}
         </div>
-        <div>
-          {removing ? (
-            <Loader active inline size="tiny" />
-          ) : (
-            <Icon name="close" onClick={() => handleRemove(symptom.id)} color="grey" />
-          )}
-        </div>
+        {user && (
+          <div>
+            <Icon onClick={() => setEditing(true)} name="wrench" color="grey" />
+            {removing ? (
+              <Loader active inline size="tiny" />
+            ) : (
+              <Icon name="close" onClick={() => handleRemove(symptom.id)} color="grey" />
+            )}
+          </div>
+        )}
       </div>
     </SymptomPickerRowContainer>
   );
