@@ -42,7 +42,7 @@
     "dev": "npm-run-all --parallel server client",
     "client": "react-scripts start",
     "server": "nodemon",
-    "build": "npm-run-all --parallel build:*",
+    "build": "npm-run-all --sequential build:client build:server",
     "test": "NODE_ENV=test jest --watchAll --verbose",
     "test-coverage": "NODE_ENV=test jest --coverage",
     "eject": "react-scripts eject",
