@@ -9,9 +9,10 @@ import Diagnosis from 'classes/Diagnosis.class';
 export interface SymptomTagProps {
   symptom: Symptom;
   diagnosis: Diagnosis;
+  style?: any;
 }
 
-const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom: s, diagnosis }) => {
+const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom: s, diagnosis, style }) => {
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const user = useSelector((state: ReduxState) => state.auth.user);
   const [modalOpen, setModalOpen] = useState(false);
@@ -35,6 +36,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom: s, diagnosis }) => {
       disabled={!s.description}
       trigger={
         <Tag
+          style={style}
           active={symptomIds.includes(s.id)}
           notParent={diagnosis.symptoms.map((s) => s.id).includes(s.id)}
         >

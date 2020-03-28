@@ -15,6 +15,13 @@ export interface DiagnosisTableRowProps {
   diagnosis: Diagnosis;
 }
 
+const Break = styled.div`
+  flex-basis: 100%;
+  border-bottom: 1px solid lightgrey;
+  height: 5px;
+  padding: 5px;
+`;
+
 export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
   border-radius: 5px;
   background-color: ${(props) => (props.active ? '#0089e0' : props.notParent ? '#ffdd8f' : null)};
@@ -36,10 +43,14 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setEditing] = useState(false);
   const user = useSelector((state: ReduxState) => state.auth.user);
+  const allSymptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
   const symptoms = totalSymptoms(diagnosis);
   const pickedSymptoms = symptoms.filter((s) => symptomIds.includes(s.id));
+  const excessSymptoms = allSymptoms.filter(
+    (symp) => !symptoms.map((s) => s.id).includes(symp.id) && symptomIds.includes(symp.id)
+  );
 
   const sorter = (a: Symptom, b: Symptom) => {
     return a.name.localeCompare(b.name);
@@ -93,6 +104,19 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
                   ) : (
                     <Tag onClick={() => setAdding(true)}>+ Tilføj symptom</Tag>
                   ))
+              )
+              .concat(
+                <>
+                  <Break />
+                  <span style={{ alignSelf: 'center' }}>Ikke matchende symptomer: </span>
+                  {excessSymptoms.map((s) => (
+                    <SymptomTag
+                      diagnosis={diagnosis}
+                      symptom={s}
+                      style={{ backgroundColor: '#870000', color: 'white' }}
+                    />
+                  ))}
+                </>
               )}
           </div>
         </Table.Cell>
