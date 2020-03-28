@@ -22,6 +22,8 @@ export type Diagnosis = {
   icdCode?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   symptoms?: Maybe<Array<Maybe<Symptom>>>;
+  parents?: Maybe<Array<Maybe<Diagnosis>>>;
+  children?: Maybe<Array<Maybe<Diagnosis>>>;
 };
 
 export type DiagnosisInput = {
@@ -38,11 +40,15 @@ export type Mutation = {
   logout?: Maybe<Scalars['String']>;
   createDiagnosis?: Maybe<Diagnosis>;
   updateDiagnosis?: Maybe<Diagnosis>;
+  removeDiagnosis?: Maybe<Scalars['Int']>;
+  addDiagnosisParent?: Maybe<Diagnosis>;
+  removeDiagnosisParent?: Maybe<Diagnosis>;
   addSymptomToDiagnosis?: Maybe<Diagnosis>;
   removeSymptomFromDiagnosis?: Maybe<Diagnosis>;
   createSymptom?: Maybe<Symptom>;
   updateSymptom?: Maybe<Symptom>;
   removeSymptom?: Maybe<Scalars['Int']>;
+  addSymptomChild?: Maybe<Symptom>;
 };
 
 
@@ -64,6 +70,23 @@ export type MutationCreateDiagnosisArgs = {
 export type MutationUpdateDiagnosisArgs = {
   id?: Maybe<Scalars['Int']>;
   data?: Maybe<DiagnosisInput>;
+};
+
+
+export type MutationRemoveDiagnosisArgs = {
+  id?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationAddDiagnosisParentArgs = {
+  id?: Maybe<Scalars['Int']>;
+  parentId?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationRemoveDiagnosisParentArgs = {
+  id?: Maybe<Scalars['Int']>;
+  parentId?: Maybe<Scalars['Int']>;
 };
 
 
@@ -94,6 +117,12 @@ export type MutationRemoveSymptomArgs = {
   id?: Maybe<Scalars['Int']>;
 };
 
+
+export type MutationAddSymptomChildArgs = {
+  id?: Maybe<Scalars['Int']>;
+  childId?: Maybe<Scalars['Int']>;
+};
+
 export type Query = {
    __typename?: 'Query';
   _empty?: Maybe<Scalars['String']>;
@@ -107,6 +136,8 @@ export type Symptom = {
   id?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
+  parents?: Maybe<Array<Maybe<Symptom>>>;
+  children?: Maybe<Array<Maybe<Symptom>>>;
 };
 
 export type SymptomInput = {

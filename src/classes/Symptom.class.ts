@@ -12,6 +12,12 @@ class Symptom {
       id
       name
       description
+      parents {
+        id
+      }
+      children {
+        id
+      }
     }
   `;
 

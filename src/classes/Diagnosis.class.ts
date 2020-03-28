@@ -17,6 +17,12 @@ class Diagnosis {
       symptoms {
         ...Symptom
       }
+      parents {
+        id
+      }
+      children {
+        id
+      }
     }
     ${Symptom.fragment}
   `;
@@ -135,6 +141,40 @@ class Diagnosis {
     } catch (error) {
       store.dispatch(diagnosisReducer.actions.setStatus('error'));
     }
+  };
+
+  static addParent = async (id: number, parentId: number) => {
+    const mutation = gql`
+      mutation AddDiagnosisParent($id: Int, $parentId: Int) {
+        addDiagnosisParent(id: $id, parentId: $parentId) {
+          ...Diagnosis
+        }
+      }
+      ${Diagnosis.fragment}
+    `;
+
+    const diagnosis = await Apollo.mutate<Diagnosis>('addDiagnosisParent', mutation, {
+      id,
+      parentId
+    });
+    store.dispatch(diagnosisReducer.actions.addDiagnosis(diagnosis));
+  };
+
+  static removeParent = async (id: number, parentId: number) => {
+    const mutation = gql`
+      mutation RemoveDiagnosisParent($id: Int, $parentId: Int) {
+        removeDiagnosisParent(id: $id, parentId: $parentId) {
+          ...Diagnosis
+        }
+      }
+      ${Diagnosis.fragment}
+    `;
+
+    const diagnosis = await Apollo.mutate<Diagnosis>('removeDiagnosisParent', mutation, {
+      id,
+      parentId
+    });
+    store.dispatch(diagnosisReducer.actions.addDiagnosis(diagnosis));
   };
 }
 

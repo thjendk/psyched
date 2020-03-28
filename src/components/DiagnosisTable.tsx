@@ -32,6 +32,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
         <Table.HeaderCell width={1}>Diagnose</Table.HeaderCell>
         <Table.HeaderCell width={1}>ICD-10 kode</Table.HeaderCell>
         <Table.HeaderCell width={4}>Beskrivelse</Table.HeaderCell>
+        <Table.HeaderCell width={2}>Overdiagnose</Table.HeaderCell>
         <Table.HeaderCell>Symptomer</Table.HeaderCell>
         <Table.HeaderCell>Opfyldt</Table.HeaderCell>
         {user && <Table.HeaderCell>Muligheder</Table.HeaderCell>}

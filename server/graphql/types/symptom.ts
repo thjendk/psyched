@@ -1,6 +1,7 @@
 import { gql } from 'apollo-server-express';
 import { Resolvers } from 'types/resolvers-types';
 import Symptoms from 'models/symptoms.model';
+import SymptomParent from 'models/symptomsParents.model';
 
 export const typeDefs = gql`
   extend type Query {
@@ -11,12 +12,15 @@ export const typeDefs = gql`
     createSymptom(data: SymptomInput): Symptom
     updateSymptom(id: Int, data: SymptomInput): Symptom
     removeSymptom(id: Int): Int
+    addSymptomChild(id: Int, childId: Int): Symptom
   }
 
   type Symptom {
     id: Int
     name: String
     description: String
+    parents: [Symptom]
+    children: [Symptom]
   }
 
   input SymptomInput {
@@ -59,6 +63,14 @@ export const resolvers: Resolvers = {
     description: async ({ id }, args, ctx) => {
       const symptom = await ctx.symptomLoader.load(id);
       return symptom.description;
+    },
+    parents: async ({ id }) => {
+      const parents = await SymptomParent.query().where({ symptomId: id });
+      return parents.map((p) => ({ id: p.parentId }));
+    },
+    children: async ({ id }) => {
+      const parents = await SymptomParent.query().where({ parentId: id });
+      return parents.map((p) => ({ id: p.symptomId }));
     }
   }
 };

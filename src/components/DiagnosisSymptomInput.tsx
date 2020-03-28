@@ -14,8 +14,19 @@ const DiagnosisSymptomInput: React.SFC<DiagnosisSymptomInputProps> = ({ diagnosi
   const [value, setValue] = useState<number>(null);
   const [submitting, setSubmitting] = useState(false);
   const ref = useRef(null);
+  const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
   let symptoms: any = useSelector((state: ReduxState) =>
-    state.symptoms.symptoms.filter((s) => !diagnosis.symptoms.map((ds) => ds.id).includes(s.id))
+    state.symptoms.symptoms.filter(
+      (s) =>
+        !diagnosis.symptoms
+          .concat(
+            diagnoses
+              .filter((d) => d.children.map((p) => p.id).includes(diagnosis.id))
+              .flatMap((d) => d.symptoms)
+          )
+          .map((ds) => ds.id)
+          .includes(s.id)
+    )
   );
   symptoms = symptoms.map((s: Symptom) => ({
     text: s.name.toTitleCase(),
@@ -42,6 +53,7 @@ const DiagnosisSymptomInput: React.SFC<DiagnosisSymptomInputProps> = ({ diagnosi
       loading={submitting}
       disabled={submitting}
       onBlur={handleSubmit}
+      value={value}
       style={{ marginLeft: '5px' }}
       options={symptoms}
       onChange={(e, { value }) => setValue(value as number)}

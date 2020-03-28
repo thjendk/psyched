@@ -2,6 +2,7 @@ import { gql } from 'apollo-server-express';
 import { Resolvers } from 'types/resolvers-types';
 import Diagnoses from 'models/diagnoses.model';
 import DiagnosisSymptoms from 'models/diagnosisSymptoms.model';
+import DiagnosisParent from 'models/diagnosesParents.model';
 
 export const typeDefs = gql`
   extend type Query {
@@ -12,6 +13,8 @@ export const typeDefs = gql`
     createDiagnosis(data: DiagnosisInput): Diagnosis
     updateDiagnosis(id: Int, data: DiagnosisInput): Diagnosis
     removeDiagnosis(id: Int): Int
+    addDiagnosisParent(id: Int, parentId: Int): Diagnosis
+    removeDiagnosisParent(id: Int, parentId: Int): Diagnosis
     addSymptomToDiagnosis(diagnosisId: Int, symptomId: Int): Diagnosis
     removeSymptomFromDiagnosis(diagnosisId: Int, symptomId: Int): Diagnosis
   }
@@ -22,6 +25,8 @@ export const typeDefs = gql`
     icdCode: String
     description: String
     symptoms: [Symptom]
+    parents: [Diagnosis]
+    children: [Diagnosis]
   }
 
   input DiagnosisInput {
@@ -66,6 +71,16 @@ export const resolvers: Resolvers = {
         .where({ symptomId, diagnosisId })
         .delete();
       return { id: diagnosisId };
+    },
+    addDiagnosisParent: async (root, { id, parentId }, ctx) => {
+      await DiagnosisParent.query().insert({ diagnosisId: id, parentId, userId: ctx.user.userId });
+      return { id };
+    },
+    removeDiagnosisParent: async (root, { id, parentId }, ctx) => {
+      await DiagnosisParent.query()
+        .where({ diagnosisId: id, parentId, userId: ctx.user.userId })
+        .delete();
+      return { id };
     }
   },
 
@@ -86,6 +101,14 @@ export const resolvers: Resolvers = {
     symptoms: async ({ id }) => {
       const joins = await DiagnosisSymptoms.query().where({ diagnosisId: id });
       return joins.map((j) => ({ id: j.symptomId }));
+    },
+    parents: async ({ id }) => {
+      const parents = await DiagnosisParent.query().where({ diagnosisId: id });
+      return parents.map((p) => ({ id: p.parentId }));
+    },
+    children: async ({ id }) => {
+      const parents = await DiagnosisParent.query().where({ parentId: id });
+      return parents.map((p) => ({ id: p.diagnosisId }));
     }
   }
 };

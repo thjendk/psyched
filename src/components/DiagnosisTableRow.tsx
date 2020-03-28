@@ -7,12 +7,13 @@ import Symptom from 'classes/Symptom.class';
 import DiagnosisSymptomInput from './DiagnosisSymptomInput';
 import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
+import DiagnosisParentInput from './DiagnosisParentInput';
 
 export interface DiagnosisTableRowProps {
   diagnosis: Diagnosis;
 }
 
-const Tag = styled.span<{ active?: boolean }>`
+export const Tag = styled.span<{ active?: boolean }>`
   border-radius: 5px;
   background-color: ${(props) => (props.active ? '#0089e0' : null)};
   padding: 3px 10px;
@@ -36,7 +37,13 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
   const [removeLoading, setRemoveLoading] = useState(false);
   const user = useSelector((state: ReduxState) => state.auth.user);
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
-  const symptoms = diagnosis.symptoms.filter((s) => symptomIds.includes(s.id));
+  const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
+  const symptoms = diagnosis.symptoms.concat(
+    diagnoses
+      .filter((d) => d.children.map((p) => p.id).includes(diagnosis.id))
+      .flatMap((d) => d.symptoms)
+  );
+  const pickedSymptoms = diagnosis.symptoms.filter((s) => symptomIds.includes(s.id));
 
   const handlePick = (id: number) => {
     Symptom.pick(id);
@@ -60,6 +67,10 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
     setIsDeleting(false);
   };
 
+  const handleRemoveParent = async (parentId: number) => {
+    await Diagnosis.removeParent(diagnosis.id, parentId);
+  };
+
   if (isEditing) return <DiagnosisInputRow diagnosis={diagnosis} setEditing={setEditing} />;
   return (
     <>
@@ -69,7 +80,19 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
         <Table.Cell>{diagnosis.description}</Table.Cell>
         <Table.Cell>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-            {diagnosis.symptoms
+            {diagnosis.parents
+              .map((p) => (
+                <Tag>
+                  {diagnoses.find((d) => d.id === p.id).name}{' '}
+                  <Icon onClick={() => handleRemoveParent(p.id)} name="close" color="grey" />
+                </Tag>
+              ))
+              .concat(user && <DiagnosisParentInput diagnosis={diagnosis} />)}
+          </div>
+        </Table.Cell>
+        <Table.Cell>
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {symptoms
               .slice()
               .sort(sorter)
               .map((s) => (
@@ -127,7 +150,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
           </div>
         </Table.Cell>
         <Table.Cell>
-          {symptoms.length} / {diagnosis.symptoms.length}
+          {pickedSymptoms.length} / {diagnosis.symptoms.length}
         </Table.Cell>
         {user && (
           <Table.Cell>
