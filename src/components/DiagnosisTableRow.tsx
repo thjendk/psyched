@@ -6,6 +6,7 @@ import { ReduxState } from 'redux/reducers';
 import Symptom from 'classes/Symptom.class';
 import DiagnosisSymptomInput from './DiagnosisSymptomInput';
 import Diagnosis from 'classes/Diagnosis.class';
+import DiagnosisInputRow from './DiagnosisInputRow';
 
 export interface DiagnosisTableRowProps {
   diagnosis: Diagnosis;
@@ -28,6 +29,9 @@ const Tag = styled.span<{ active?: boolean }>`
 const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => {
   const [adding, setAdding] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setEditing] = useState(false);
   const [removeLoading, setRemoveLoading] = useState(false);
   const user = useSelector((state: ReduxState) => state.auth.user);
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
@@ -48,10 +52,19 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
     setRemoveLoading(false);
   };
 
+  const handleRemove = async () => {
+    setIsDeleting(true);
+    await Diagnosis.remove(diagnosis.id);
+    setDeleteModal(false);
+    setIsDeleting(false);
+  };
+
+  if (isEditing) return <DiagnosisInputRow diagnosis={diagnosis} setEditing={setEditing} />;
   return (
     <>
       <Table.Row>
         <Table.Cell width={4}>{diagnosis.name}</Table.Cell>
+        <Table.Cell>{diagnosis.icdCode}</Table.Cell>
         <Table.Cell>{diagnosis.description}</Table.Cell>
         <Table.Cell>
           {diagnosis.symptoms
@@ -111,6 +124,37 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
         <Table.Cell>
           {symptoms.length} / {diagnosis.symptoms.length}
         </Table.Cell>
+        {user && (
+          <Table.Cell>
+            <Button onClick={() => setEditing(true)} basic color="orange">
+              Rediger
+            </Button>
+            <Modal
+              open={deleteModal}
+              trigger={
+                <Button onClick={() => setDeleteModal(true)} basic color="red">
+                  Slet
+                </Button>
+              }
+            >
+              <Modal.Header>Vil du slette {diagnosis.name}?</Modal.Header>
+              <Modal.Actions>
+                <Button basic color="black" onClick={() => setDeleteModal(false)}>
+                  <Icon name="close" /> Nej
+                </Button>
+                <Button
+                  loading={isDeleting}
+                  disabled={isDeleting}
+                  basic
+                  color="red"
+                  onClick={handleRemove}
+                >
+                  <Icon name="trash" /> Ja
+                </Button>
+              </Modal.Actions>
+            </Modal>
+          </Table.Cell>
+        )}
       </Table.Row>
     </>
   );

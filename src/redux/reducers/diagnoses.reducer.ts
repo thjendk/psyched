@@ -18,6 +18,10 @@ const diagnosisReducer = createSlice({
     addDiagnosis: (state, action: PayloadAction<Diagnosis>) => {
       insertOrReplace(state.diagnoses, action.payload);
     },
+    removeDiagnosis: (state, action: PayloadAction<number>) => {
+      const index = state.diagnoses.findIndex((d) => d.id === action.payload);
+      if (index !== -1) state.diagnoses.splice(index, 1);
+    },
     setStatus: (state, action: PayloadAction<LoadingType>) => {
       state.status = action.payload;
     }

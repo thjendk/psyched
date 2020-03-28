@@ -34,5 +34,6 @@ export type Context = ReturnType<typeof generateContext>;
 export default new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req, res }) => generateContext(req, res)
+  context: ({ req, res }) => generateContext(req, res),
+  playground: process.env.NODE_ENV === 'production' ? false : true
 });

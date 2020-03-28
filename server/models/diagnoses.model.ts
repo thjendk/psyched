@@ -4,6 +4,8 @@ interface Diagnoses {
   diagnosisId: number;
   name: string;
   description: string;
+  icdCode: string;
+  userId: number;
 }
 
 class Diagnoses extends Model {

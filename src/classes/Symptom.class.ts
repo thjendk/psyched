@@ -60,6 +60,17 @@ class Symptom {
   };
 
   static update = async (id: number, data: SymptomInput) => {};
+
+  static remove = async (id: number) => {
+    const mutation = gql`
+      mutation RemoveSymptom($id: Int) {
+        removeSymptom(id: $id)
+      }
+    `;
+
+    const result = await Apollo.mutate<number>('removeSymptom', mutation, { id });
+    store.dispatch(symptomReducer.actions.removeSymptom(result));
+  };
 }
 
 export default Symptom;

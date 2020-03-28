@@ -12,6 +12,9 @@ export async function up(knex: Knex): Promise<any> {
       .references('diagnoses.diagnosis_id')
       .onDelete('cascade')
       .onUpdate('cascade');
+    t.integer('user_id')
+      .unsigned()
+      .references('users.user_id');
     t.primary(['symptom_id', 'diagnosis_id']);
   });
 }

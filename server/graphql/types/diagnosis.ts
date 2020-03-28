@@ -11,6 +11,7 @@ export const typeDefs = gql`
   extend type Mutation {
     createDiagnosis(data: DiagnosisInput): Diagnosis
     updateDiagnosis(id: Int, data: DiagnosisInput): Diagnosis
+    removeDiagnosis(id: Int): Int
     addSymptomToDiagnosis(diagnosisId: Int, symptomId: Int): Diagnosis
     removeSymptomFromDiagnosis(diagnosisId: Int, symptomId: Int): Diagnosis
   }
@@ -18,6 +19,7 @@ export const typeDefs = gql`
   type Diagnosis {
     id: Int
     name: String
+    icdCode: String
     description: String
     symptoms: [Symptom]
   }
@@ -25,6 +27,7 @@ export const typeDefs = gql`
   input DiagnosisInput {
     name: String
     description: String
+    icdCode: String
   }
 `;
 
@@ -37,18 +40,25 @@ export const resolvers: Resolvers = {
   },
 
   Mutation: {
-    createDiagnosis: async (root, { data }) => {
-      const diagnosis = await Diagnoses.query().insertAndFetch(data);
+    createDiagnosis: async (root, { data }, ctx) => {
+      const diagnosis = await Diagnoses.query().insertAndFetch({
+        ...data,
+        userId: ctx.user.userId
+      });
       return { id: diagnosis.diagnosisId };
     },
-    updateDiagnosis: async (root, { id, data }) => {
+    updateDiagnosis: async (root, { id, data }, ctx) => {
       const diagnosis = await Diagnoses.query()
-        .updateAndFetchById(id, data)
+        .updateAndFetchById(id, { ...data, userId: ctx.user.userId })
         .skipUndefined();
       return { id: diagnosis.diagnosisId };
     },
-    addSymptomToDiagnosis: async (root, { symptomId, diagnosisId }) => {
-      await DiagnosisSymptoms.query().insert({ symptomId, diagnosisId });
+    removeDiagnosis: async (root, { id }) => {
+      await Diagnoses.query().deleteById(id);
+      return id;
+    },
+    addSymptomToDiagnosis: async (root, { symptomId, diagnosisId }, ctx) => {
+      await DiagnosisSymptoms.query().insert({ symptomId, diagnosisId, userId: ctx.user.userId });
       return { id: diagnosisId };
     },
     removeSymptomFromDiagnosis: async (root, { symptomId, diagnosisId }) => {
@@ -64,6 +74,10 @@ export const resolvers: Resolvers = {
     name: async ({ id }, args, ctx) => {
       const diagnosis = await ctx.diagnosisLoader.load(id);
       return diagnosis.name;
+    },
+    icdCode: async ({ id }, args, ctx) => {
+      const diagnosis = await ctx.diagnosisLoader.load(id);
+      return diagnosis.icdCode;
     },
     description: async ({ id }, args, ctx) => {
       const diagnosis = await ctx.diagnosisLoader.load(id);

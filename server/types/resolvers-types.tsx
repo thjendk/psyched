@@ -21,6 +21,7 @@ export type Diagnosis = {
    __typename?: 'Diagnosis';
   id?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
+  icdCode?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   symptoms?: Maybe<Array<Maybe<Symptom>>>;
 };
@@ -28,6 +29,7 @@ export type Diagnosis = {
 export type DiagnosisInput = {
   name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
+  icdCode?: Maybe<Scalars['String']>;
 };
 
 export type Mutation = {
@@ -42,6 +44,7 @@ export type Mutation = {
   removeSymptomFromDiagnosis?: Maybe<Diagnosis>;
   createSymptom?: Maybe<Symptom>;
   updateSymptom?: Maybe<Symptom>;
+  removeSymptom?: Maybe<Scalars['Int']>;
 };
 
 
@@ -86,6 +89,11 @@ export type MutationCreateSymptomArgs = {
 export type MutationUpdateSymptomArgs = {
   id?: Maybe<Scalars['Int']>;
   data?: Maybe<SymptomInput>;
+};
+
+
+export type MutationRemoveSymptomArgs = {
+  id?: Maybe<Scalars['Int']>;
 };
 
 export type Query = {
@@ -231,6 +239,7 @@ export type ResolversParentTypes = ResolversObject<{
 export type DiagnosisResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Diagnosis'] = ResolversParentTypes['Diagnosis']> = ResolversObject<{
   id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  icdCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   symptoms?: Resolver<Maybe<Array<Maybe<ResolversTypes['Symptom']>>>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
@@ -247,6 +256,7 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   removeSymptomFromDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationRemoveSymptomFromDiagnosisArgs, never>>,
   createSymptom?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType, RequireFields<MutationCreateSymptomArgs, never>>,
   updateSymptom?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType, RequireFields<MutationUpdateSymptomArgs, never>>,
+  removeSymptom?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType, RequireFields<MutationRemoveSymptomArgs, never>>,
 }>;
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{

@@ -3,6 +3,7 @@ import { Model } from 'objection';
 interface DiagnosisSymptoms {
   symptomId: number;
   diagnosisId: number;
+  userId: number;
 }
 
 class DiagnosisSymptoms extends Model {

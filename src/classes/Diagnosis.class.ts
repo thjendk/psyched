@@ -12,6 +12,7 @@ class Diagnosis {
     fragment Diagnosis on Diagnosis {
       id
       name
+      icdCode
       description
       symptoms {
         ...Symptom
@@ -77,6 +78,17 @@ class Diagnosis {
     } catch (error) {
       store.dispatch(diagnosisReducer.actions.setStatus('error'));
     }
+  };
+
+  static remove = async (id: number) => {
+    const mutation = gql`
+      mutation RemoveDiagnosis($id: Int) {
+        removeDiagnosis(id: $id)
+      }
+    `;
+
+    const result = await Apollo.mutate<number>('removeDiagnosis', mutation, { id });
+    store.dispatch(diagnosisReducer.actions.removeDiagnosis(result));
   };
 
   static addSymptom = async (diagnosisId: number, symptomId: number) => {

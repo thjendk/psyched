@@ -5,6 +5,9 @@ export async function up(knex: Knex): Promise<any> {
     t.increments('symptom_id');
     t.string('name');
     t.text('description');
+    t.integer('user_id')
+      .unsigned()
+      .references('users.user_id');
   });
 }
 

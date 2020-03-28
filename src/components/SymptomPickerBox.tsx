@@ -1,27 +1,10 @@
 import React, { useState } from 'react';
 import Symptom from 'classes/Symptom.class';
-import styled from 'styled-components';
 import { Input, Divider } from 'semantic-ui-react';
-import Highlight from 'react-highlighter';
 import SymptomPickerInput from './SymptomPickerInput';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
-
-const SymptomPickerRow = styled.p`
-  border: 1px solid lightgrey;
-  border-bottom: 0px;
-  padding: 5px 5px;
-  margin: 0;
-
-  :last-child {
-    border-bottom: 1px solid lightgrey;
-  }
-
-  :hover {
-    cursor: pointer;
-    background-color: #f0f0f0;
-  }
-`;
+import SymptomPickerRow, { SymptomPickerRowContainer } from './SymptomPickerRow';
 
 export interface SymptomPickerBoxProps {
   symptoms: Symptom[];
@@ -37,10 +20,6 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
       s.name.toLowerCase().includes(search.toLowerCase()) ||
       s.description?.toLowerCase().includes(search.toLowerCase())
   );
-
-  const handlePick = (id: number) => {
-    Symptom.pick(id);
-  };
 
   const sorter = (a: Symptom, b: Symptom) => {
     return a.name.localeCompare(b.name);
@@ -58,26 +37,16 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
       {symptoms
         .slice()
         .sort(sorter)
-        .map((s) => (
-          <SymptomPickerRow onClick={() => handlePick(s.id)}>
-            <Highlight search={search}>{s.name.toTitleCase()}</Highlight>
-            {s.description && (
-              <span>
-                {' '}
-                <Highlight search={search}>({s.description})</Highlight>
-              </span>
-            )}
-          </SymptomPickerRow>
-        ))
+        .map((s) => <SymptomPickerRow symptom={s} search={search} />)
         .concat(
           all &&
             (adding ? (
               <SymptomPickerInput setAdding={setAdding} />
             ) : (
               user && (
-                <SymptomPickerRow onClick={() => setAdding(true)}>
+                <SymptomPickerRowContainer onClick={() => setAdding(true)}>
                   + Tilføj symptom...
-                </SymptomPickerRow>
+                </SymptomPickerRowContainer>
               )
             ))
         )}

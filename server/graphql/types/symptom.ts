@@ -10,6 +10,7 @@ export const typeDefs = gql`
   extend type Mutation {
     createSymptom(data: SymptomInput): Symptom
     updateSymptom(id: Int, data: SymptomInput): Symptom
+    removeSymptom(id: Int): Int
   }
 
   type Symptom {
@@ -33,15 +34,19 @@ export const resolvers: Resolvers = {
   },
 
   Mutation: {
-    createSymptom: async (root, { data }) => {
-      const symptom = await Symptoms.query().insertAndFetch(data);
+    createSymptom: async (root, { data }, ctx) => {
+      const symptom = await Symptoms.query().insertAndFetch({ ...data, userId: ctx.user.userId });
       return { id: symptom.symptomId };
     },
-    updateSymptom: async (root, { id, data }) => {
+    updateSymptom: async (root, { id, data }, ctx) => {
       const symptom = await Symptoms.query()
-        .updateAndFetchById(id, data)
+        .updateAndFetchById(id, { ...data, userId: ctx.user.userId })
         .skipUndefined();
       return { id: symptom.symptomId };
+    },
+    removeSymptom: async (root, { id }) => {
+      await Symptoms.query().deleteById(id);
+      return id;
     }
   },
 

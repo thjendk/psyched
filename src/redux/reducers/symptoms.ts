@@ -30,6 +30,10 @@ const symptomReducer = createSlice({
       } else {
         state.selectedIds.push(action.payload);
       }
+    },
+    removeSymptom: (state, action: PayloadAction<number>) => {
+      const index = state.symptoms.findIndex((s) => s.id === action.payload);
+      if (index !== -1) state.symptoms.splice(index, 1);
     }
   }
 });
