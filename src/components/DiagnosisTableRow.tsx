@@ -73,8 +73,13 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
             {diagnosis.parents
               .map((p) => (
                 <Tag>
-                  {diagnoses.find((d) => d.id === p.id).name}{' '}
-                  <Icon onClick={() => handleRemoveParent(p.id)} name="close" color="grey" />
+                  {diagnoses.find((d) => d.id === p.id).name}
+                  {user && (
+                    <>
+                      {' '}
+                      <Icon onClick={() => handleRemoveParent(p.id)} name="close" color="grey" />
+                    </>
+                  )}
                 </Tag>
               ))
               .concat(user && <DiagnosisParentInput diagnosis={diagnosis} />)}
