@@ -10,10 +10,7 @@ import DiagnosisInputRow from './DiagnosisInputRow';
 import DiagnosisParentInput from './DiagnosisParentInput';
 import SymptomTag from './SymptomTag';
 import { totalSymptoms } from 'utils/utils';
-
-export interface DiagnosisTableRowProps {
-  diagnosis: Diagnosis;
-}
+import Highlighter from 'react-highlighter';
 
 const Break = styled.div`
   flex-basis: 100%;
@@ -37,7 +34,12 @@ export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
   }
 `;
 
-const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => {
+export interface DiagnosisTableRowProps {
+  diagnosis: Diagnosis;
+  search: String;
+}
+
+const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, search }) => {
   const [adding, setAdding] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -85,9 +87,15 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
   return (
     <>
       <Table.Row>
-        <Table.Cell>{diagnosis.name}</Table.Cell>
-        <Table.Cell textAlign="center">{diagnosis.icdCode}</Table.Cell>
-        <Table.Cell>{diagnosis.description}</Table.Cell>
+        <Table.Cell>
+          <Highlighter search={search}>{diagnosis.name}</Highlighter>
+        </Table.Cell>
+        <Table.Cell textAlign="center">
+          <Highlighter search={search}>{diagnosis.icdCode}</Highlighter>
+        </Table.Cell>
+        <Table.Cell>
+          <Highlighter search={search}>{diagnosis.description}</Highlighter>
+        </Table.Cell>
         <Table.Cell>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             {diagnosis.parents
