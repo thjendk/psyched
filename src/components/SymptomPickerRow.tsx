@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Highlight from 'react-highlighter';
-import { Loader, Icon } from 'semantic-ui-react';
+import { Loader, Icon, Modal, Button } from 'semantic-ui-react';
 import Symptom from 'classes/Symptom.class';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
@@ -32,22 +32,24 @@ const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom })
   const user = useSelector((state: ReduxState) => state.auth.user);
   const [removing, setRemoving] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const handleRemove = async (id: number) => {
+  const handleRemove = async () => {
     setRemoving(true);
-    await Symptom.remove(id);
+    await Symptom.remove(symptom.id);
+    setModalOpen(false);
     setRemoving(false);
   };
 
-  const handlePick = (id: number) => {
-    Symptom.pick(id);
+  const handlePick = () => {
+    Symptom.pick(symptom.id);
   };
 
   if (editing) return <SymptomPickerInput symptom={symptom} setEditing={setEditing} />;
   return (
     <SymptomPickerRowContainer>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div onClick={() => handlePick(symptom.id)}>
+        <div style={{ flexGrow: 1 }} onClick={handlePick}>
           <Highlight search={search}>{symptom.name.toTitleCase()}</Highlight>
           {symptom.description && (
             <>
@@ -64,7 +66,26 @@ const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom })
             {removing ? (
               <Loader active inline size="tiny" />
             ) : (
-              <Icon name="close" onClick={() => handleRemove(symptom.id)} color="grey" />
+              <Modal
+                open={modalOpen}
+                trigger={<Icon name="close" onClick={() => setModalOpen(true)} color="grey" />}
+              >
+                <Modal.Header>Vil du slette {symptom.name}?</Modal.Header>
+                <Modal.Actions>
+                  <Button onClick={() => setModalOpen(false)} basic color="black">
+                    <Icon name="close" /> Nej
+                  </Button>
+                  <Button
+                    loading={removing}
+                    disabled={removing}
+                    onClick={handleRemove}
+                    basic
+                    color="red"
+                  >
+                    <Icon name="trash" /> Ja
+                  </Button>
+                </Modal.Actions>
+              </Modal>
             )}
           </div>
         )}
