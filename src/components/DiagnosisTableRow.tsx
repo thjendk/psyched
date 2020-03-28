@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Popup, Icon, Modal, Button } from 'semantic-ui-react';
+import { Table, Icon, Modal, Button } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
@@ -8,14 +8,15 @@ import DiagnosisSymptomInput from './DiagnosisSymptomInput';
 import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
 import DiagnosisParentInput from './DiagnosisParentInput';
+import SymptomTag from './SymptomTag';
 
 export interface DiagnosisTableRowProps {
   diagnosis: Diagnosis;
 }
 
-export const Tag = styled.span<{ active?: boolean }>`
+export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
   border-radius: 5px;
-  background-color: ${(props) => (props.active ? '#0089e0' : null)};
+  background-color: ${(props) => (props.active ? '#0089e0' : props.notParent ? '#ffdd8f' : null)};
   padding: 3px 10px;
   color: ${(props) => (props.active ? 'white' : null)};
   margin-left: 5px;
@@ -30,34 +31,23 @@ export const Tag = styled.span<{ active?: boolean }>`
 
 const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => {
   const [adding, setAdding] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setEditing] = useState(false);
-  const [removeLoading, setRemoveLoading] = useState(false);
   const user = useSelector((state: ReduxState) => state.auth.user);
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
   const symptoms = diagnosis.symptoms.concat(
     diagnoses
       .filter((d) => d.children.map((p) => p.id).includes(diagnosis.id))
-      .flatMap((d) => d.symptoms)
+      .flatMap((d) =>
+        d.symptoms.filter((s) => !diagnosis.symptoms.map((symp) => symp.id).includes(s.id))
+      )
   );
   const pickedSymptoms = diagnosis.symptoms.filter((s) => symptomIds.includes(s.id));
 
-  const handlePick = (id: number) => {
-    Symptom.pick(id);
-  };
-
   const sorter = (a: Symptom, b: Symptom) => {
     return a.name.localeCompare(b.name);
-  };
-
-  const handleRemoveSymptom = async (id: number) => {
-    setRemoveLoading(true);
-    await Diagnosis.removeSymptom(diagnosis.id, id);
-    setModalOpen(false);
-    setRemoveLoading(false);
   };
 
   const handleRemove = async () => {
@@ -95,50 +85,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
             {symptoms
               .slice()
               .sort(sorter)
-              .map((s) => (
-                <Popup
-                  position="top center"
-                  disabled={!s.description}
-                  trigger={
-                    <Tag active={symptomIds.includes(s.id)}>
-                      <span onClick={() => handlePick(s.id)}>{s.name.toTitleCase()}</span>
-                      {user && (
-                        <Modal
-                          open={modalOpen}
-                          trigger={
-                            <Icon
-                              style={{ marginLeft: '4px' }}
-                              color="grey"
-                              onClick={() => setModalOpen(true)}
-                              name="close"
-                            />
-                          }
-                        >
-                          <Modal.Header>
-                            Vil du fjerne {s.name} fra {diagnosis.name}?
-                          </Modal.Header>
-                          <Modal.Actions>
-                            <Button basic color="black" onClick={() => setModalOpen(false)}>
-                              <Icon name="close" /> Nej
-                            </Button>
-                            <Button
-                              basic
-                              color="red"
-                              loading={removeLoading}
-                              disabled={removeLoading}
-                              onClick={() => handleRemoveSymptom(s.id)}
-                            >
-                              <Icon name="trash" /> Ja
-                            </Button>
-                          </Modal.Actions>
-                        </Modal>
-                      )}
-                    </Tag>
-                  }
-                >
-                  {s.description}
-                </Popup>
-              ))
+              .map((s) => <SymptomTag symptom={s} diagnosis={diagnosis} />)
               .concat(
                 user &&
                   (adding ? (

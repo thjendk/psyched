@@ -22,7 +22,9 @@ const DiagnosisSymptomInput: React.SFC<DiagnosisSymptomInputProps> = ({ diagnosi
           .concat(
             diagnoses
               .filter((d) => d.children.map((p) => p.id).includes(diagnosis.id))
-              .flatMap((d) => d.symptoms)
+              .flatMap((d) =>
+                d.symptoms.filter((s) => diagnosis.symptoms.map((symp) => symp.id).includes(s.id))
+              )
           )
           .map((ds) => ds.id)
           .includes(s.id)
