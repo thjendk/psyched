@@ -10,13 +10,15 @@ export interface SymptomTagProps {
   symptom: Symptom;
   diagnosis: Diagnosis;
   style?: any;
+  point?: number;
 }
 
-const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom: s, diagnosis, style }) => {
+const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom: s, point, diagnosis, style }) => {
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const user = useSelector((state: ReduxState) => state.auth.user);
   const [modalOpen, setModalOpen] = useState(false);
   const [removeLoading, setRemoveLoading] = useState(false);
+  const isNotParent = diagnosis.symptoms.map((s) => s.symptom.id).includes(s.id);
 
   const handlePick = (id: number) => {
     Symptom.pick(id);
@@ -29,19 +31,16 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom: s, diagnosis, style }
     setRemoveLoading(false);
   };
 
+  console.log(point);
   return (
     <Popup
       key={s.id}
       position="top center"
       disabled={!s.description}
       trigger={
-        <Tag
-          style={style}
-          active={symptomIds.includes(s.id)}
-          notParent={diagnosis.symptoms.map((s) => s.id).includes(s.id)}
-        >
+        <Tag style={style} active={symptomIds.includes(s.id)} notParent={isNotParent}>
           <span onClick={() => handlePick(s.id)}>{s.name.toTitleCase()}</span>
-          {user && diagnosis.symptoms.map((s) => s.id).includes(s.id) && (
+          {user && isNotParent && (
             <Modal
               open={modalOpen}
               trigger={
@@ -72,6 +71,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom: s, diagnosis, style }
               </Modal.Actions>
             </Modal>
           )}
+          {point && isNotParent && <span style={{ marginLeft: '5px' }}>{point}</span>}
         </Tag>
       }
     >

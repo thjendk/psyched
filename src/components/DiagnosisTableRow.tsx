@@ -3,7 +3,6 @@ import { Table, Icon, Modal, Button } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
-import Symptom from 'classes/Symptom.class';
 import DiagnosisSymptomInput from './DiagnosisSymptomInput';
 import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
@@ -11,6 +10,7 @@ import DiagnosisParentInput from './DiagnosisParentInput';
 import SymptomTag from './SymptomTag';
 import { totalSymptoms } from 'utils/utils';
 import Highlighter from 'react-highlighter';
+import { DiagnosisSymptom } from 'types/generated';
 
 const Break = styled.div`
   flex-basis: 100%;
@@ -48,14 +48,17 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
   const allSymptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
-  const symptoms = totalSymptoms(diagnosis);
-  const pickedSymptoms = symptoms.filter((s) => symptomIds.includes(s.id));
+  const symptoms = totalSymptoms(diagnosis).filter((s) => s.point > 0 || !s.point);
+  console.log(symptoms);
+  const pickedSymptoms = symptoms.filter(
+    (s) => symptomIds.includes(s.symptom.id) && (s.point > 0 || !s.point)
+  );
   const excessSymptoms = allSymptoms.filter(
-    (symp) => !symptoms.map((s) => s.id).includes(symp.id) && symptomIds.includes(symp.id)
+    (symp) => !symptoms.map((s) => s.symptom.id).includes(symp.id) && symptomIds.includes(symp.id)
   );
 
-  const sorter = (a: Symptom, b: Symptom) => {
-    return a.name.localeCompare(b.name);
+  const sorter = (a: DiagnosisSymptom, b: DiagnosisSymptom) => {
+    return a.symptom.name.localeCompare(b.symptom.name);
   };
 
   const handleRemove = async () => {
@@ -74,13 +77,40 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
       <SymptomTag
         diagnosis={diagnosis}
         symptom={s}
-        style={{ backgroundColor: '#870000', color: 'white' }}
+        style={{
+          backgroundColor:
+            diagnosis.symptoms.find((symp) => symp.symptom.id === s.id)?.point < 0
+              ? 'red'
+              : '#870000',
+          color: 'white'
+        }}
       />
     ));
 
     if (excess.length === 0)
       return <Icon style={{ marginLeft: '5px', alignSelf: 'center' }} name="check" color="green" />;
     return excess;
+  };
+
+  const createAchieved = () => {
+    const keySymptoms = diagnosis.symptoms.filter((s) => symptomIds.includes(s.symptom.id));
+    const hasConflict = keySymptoms.some((s) => s.point < 0);
+    if (hasConflict)
+      return (
+        <>
+          <Icon name="close" color="red" /> Konflikt
+        </>
+      );
+    const sum = keySymptoms.reduce((sum, s) => (sum += s.point), 0);
+    return sum >= 100 ? (
+      <>
+        <Icon name="check" color="green" /> {sum}
+      </>
+    ) : (
+      <>
+        <Icon name="close" color="red" /> {sum}
+      </>
+    );
   };
 
   if (isEditing) return <DiagnosisInputRow diagnosis={diagnosis} setEditing={setEditing} />;
@@ -118,7 +148,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
             {symptoms
               .slice()
               .sort(sorter)
-              .map((s) => <SymptomTag symptom={s} diagnosis={diagnosis} />)
+              .map((s) => <SymptomTag symptom={s.symptom} point={s.point} diagnosis={diagnosis} />)
               .concat(
                 user &&
                   (adding ? (
@@ -136,6 +166,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
               )}
           </div>
         </Table.Cell>
+        <Table.Cell textAlign="center">{createAchieved()}</Table.Cell>
         <Table.Cell>
           {pickedSymptoms.length} / {symptoms.length} (
           {((pickedSymptoms.length / symptoms.length) * 100).toFixed(0)} %)

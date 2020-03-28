@@ -25,7 +25,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
 
   const sorter = (a: Diagnosis, b: Diagnosis) => {
     const percentage = (d: Diagnosis) => {
-      const selected = totalSymptoms(d).filter((s) => symptomIds.includes(s.id));
+      const selected = totalSymptoms(d).filter((s) => symptomIds.includes(s.symptom.id));
       if (selected.length === 0) return 0;
 
       return selected.length / totalSymptoms(d).length;
@@ -46,7 +46,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
       <Table celled size="small">
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell colSpan={user ? 7 : 6}>
+            <Table.HeaderCell colSpan={user ? 8 : 7}>
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -61,6 +61,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
             <Table.HeaderCell width={4}>Beskrivelse</Table.HeaderCell>
             <Table.HeaderCell style={{ width: '130px' }}>Overdiagnose</Table.HeaderCell>
             <Table.HeaderCell>Symptomer</Table.HeaderCell>
+            <Table.HeaderCell>Antal</Table.HeaderCell>
             <Table.HeaderCell>Opfyldt</Table.HeaderCell>
             {user && <Table.HeaderCell>Muligheder</Table.HeaderCell>}
           </Table.Row>

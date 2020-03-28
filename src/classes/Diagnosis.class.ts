@@ -15,7 +15,10 @@ class Diagnosis {
       icdCode
       description
       symptoms {
-        ...Symptom
+        symptom {
+          ...Symptom
+        }
+        point
       }
       parents {
         id

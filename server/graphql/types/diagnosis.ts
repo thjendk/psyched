@@ -16,6 +16,7 @@ export const typeDefs = gql`
     addDiagnosisParent(id: Int, parentId: Int): Diagnosis
     removeDiagnosisParent(id: Int, parentId: Int): Diagnosis
     addSymptomToDiagnosis(diagnosisId: Int, symptomId: Int): Diagnosis
+    updateDiagnosisSymptom(dianosisId: Int, symptomId: Int): Diagnosis
     removeSymptomFromDiagnosis(diagnosisId: Int, symptomId: Int): Diagnosis
   }
 
@@ -24,7 +25,7 @@ export const typeDefs = gql`
     name: String
     icdCode: String
     description: String
-    symptoms: [Symptom]
+    symptoms: [DiagnosisSymptom]
     parents: [Diagnosis]
     children: [Diagnosis]
   }
@@ -33,6 +34,11 @@ export const typeDefs = gql`
     name: String
     description: String
     icdCode: String
+  }
+
+  type DiagnosisSymptom {
+    point: Int
+    symptom: Symptom
   }
 `;
 
@@ -100,7 +106,7 @@ export const resolvers: Resolvers = {
     },
     symptoms: async ({ id }) => {
       const joins = await DiagnosisSymptoms.query().where({ diagnosisId: id });
-      return joins.map((j) => ({ id: j.symptomId }));
+      return joins.map((j) => ({ symptom: { id: j.symptomId }, point: j.point }));
     },
     parents: async ({ id }) => {
       const parents = await DiagnosisParent.query().where({ diagnosisId: id });
