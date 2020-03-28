@@ -52,7 +52,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom: s, diagnosis }) => {
               }
             >
               <Modal.Header>
-                Vil du fjerne {s.name} fra {diagnosis.name}? {console.log(s.id)}
+                Vil du fjerne {s.name} fra {diagnosis.name}?
               </Modal.Header>
               <Modal.Actions>
                 <Button basic color="black" onClick={() => setModalOpen(false)}>

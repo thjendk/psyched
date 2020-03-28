@@ -5,9 +5,7 @@ export const insertOrReplace = <T extends any>(array: T[], item: T, comparison: 
 };
 
 export const insertOrRemove = <T extends any>(array: T[], item: T, comparison: keyof T = 'id') => {
-  console.log(item);
   const index = array.findIndex((arrayItem) => arrayItem[comparison] === item[comparison]);
-  console.log(index);
   if (index !== -1) return array.splice(index, 1);
   return array.push(item);
 };

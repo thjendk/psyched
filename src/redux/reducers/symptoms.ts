@@ -24,7 +24,6 @@ const symptomReducer = createSlice({
     },
     addSymptomId: (state, action: PayloadAction<number>) => {
       const index = state.selectedIds.findIndex((id) => id === action.payload);
-      console.log(index);
       if (index !== -1) {
         state.selectedIds.splice(index, 1);
       } else {

@@ -9,6 +9,7 @@ import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
 import DiagnosisParentInput from './DiagnosisParentInput';
 import SymptomTag from './SymptomTag';
+import { totalSymptoms } from 'utils/utils';
 
 export interface DiagnosisTableRowProps {
   diagnosis: Diagnosis;
@@ -37,13 +38,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
   const user = useSelector((state: ReduxState) => state.auth.user);
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
-  const symptoms = diagnosis.symptoms.concat(
-    diagnoses
-      .filter((d) => d.children.map((p) => p.id).includes(diagnosis.id))
-      .flatMap((d) =>
-        d.symptoms.filter((s) => !diagnosis.symptoms.map((symp) => symp.id).includes(s.id))
-      )
-  );
+  const symptoms = totalSymptoms(diagnosis);
   const pickedSymptoms = symptoms.filter((s) => symptomIds.includes(s.id));
 
   const sorter = (a: Symptom, b: Symptom) => {
@@ -102,7 +97,8 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
           </div>
         </Table.Cell>
         <Table.Cell>
-          {pickedSymptoms.length} / {symptoms.length}
+          {pickedSymptoms.length} / {symptoms.length} (
+          {((pickedSymptoms.length / symptoms.length) * 100).toFixed(0)} %)
         </Table.Cell>
         {user && (
           <Table.Cell>

@@ -6,6 +6,7 @@ import { ReduxState } from 'redux/reducers';
 import LoadingPage from './misc/LoadingPage';
 import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
+import { totalSymptoms } from 'utils/utils';
 
 export interface DiagnosisTableProps {}
 
@@ -15,22 +16,16 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
 
   const sorter = (a: Diagnosis, b: Diagnosis) => {
-    return (
-      b.symptoms
-        .concat(
-          diagnoses
-            .filter((d) => d.children.map((p) => p.id).includes(b.id))
-            .flatMap((d) => d.symptoms)
-        )
-        .filter((s) => symptomIds.includes(s.id)).length -
-      a.symptoms
-        .concat(
-          diagnoses
-            .filter((d) => d.children.map((p) => p.id).includes(a.id))
-            .flatMap((d) => d.symptoms)
-        )
-        .filter((s) => symptomIds.includes(s.id)).length
-    );
+    const percentage = (d: Diagnosis) => {
+      const selected = totalSymptoms(d).filter((s) => symptomIds.includes(s.id));
+      if (selected.length === 0) return 0;
+
+      return selected.length / totalSymptoms(d).length;
+    };
+
+    if (percentage(a) < percentage(b)) return 1;
+    if (percentage(a) > percentage(b)) return -1;
+    return 0;
   };
 
   useEffect(() => {
