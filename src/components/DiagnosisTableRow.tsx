@@ -44,7 +44,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
         d.symptoms.filter((s) => !diagnosis.symptoms.map((symp) => symp.id).includes(s.id))
       )
   );
-  const pickedSymptoms = diagnosis.symptoms.filter((s) => symptomIds.includes(s.id));
+  const pickedSymptoms = symptoms.filter((s) => symptomIds.includes(s.id));
 
   const sorter = (a: Symptom, b: Symptom) => {
     return a.name.localeCompare(b.name);
