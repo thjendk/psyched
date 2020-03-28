@@ -11,6 +11,7 @@ export interface SymptomPickerInputProps {
 
 const BoxContainer = styled.div`
   border: 1px solid grey;
+  padding: 3px;
 `;
 
 const SymptomPickerInput: React.SFC<SymptomPickerInputProps> = ({
@@ -62,19 +63,20 @@ const SymptomPickerInput: React.SFC<SymptomPickerInputProps> = ({
         onChange={(e, { value }) => setDescription(value as string)}
       />
       <div style={{ display: 'flex' }}>
-        <Button
-          loading={isSubmitting}
-          disabled={isSubmitting}
-          fluid
-          basic
-          color="blue"
-          onClick={handleSubmit}
-        >
-          {!!symptom ? 'Rediger' : 'Tilføj'}
-        </Button>
-        <Button basic color="black" onClick={handleCancel}>
-          Annuller
-        </Button>
+        <Button.Group fluid>
+          <Button
+            loading={isSubmitting}
+            disabled={isSubmitting}
+            basic
+            color="blue"
+            onClick={handleSubmit}
+          >
+            {!!symptom ? 'Rediger' : 'Tilføj'}
+          </Button>
+          <Button basic color="black" onClick={handleCancel}>
+            Annuller
+          </Button>
+        </Button.Group>
       </div>
     </BoxContainer>
   );

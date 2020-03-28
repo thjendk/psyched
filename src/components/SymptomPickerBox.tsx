@@ -35,22 +35,22 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
       />
       <Divider />
       <div style={{ overflowY: 'auto', height: '30vh' }}>
-        {symptoms
-          .slice()
-          .sort(sorter)
-          .map((s) => <SymptomPickerRow symptom={s} search={search} />)
-          .concat(
-            all &&
-              (adding ? (
-                <SymptomPickerInput setAdding={setAdding} />
-              ) : (
-                user && (
-                  <SymptomPickerRowContainer onClick={() => setAdding(true)}>
-                    + Tilføj symptom...
-                  </SymptomPickerRowContainer>
-                )
-              ))
-          )}
+        {[
+          all &&
+            (adding ? (
+              <SymptomPickerInput setAdding={setAdding} />
+            ) : (
+              user && (
+                <SymptomPickerRowContainer onClick={() => setAdding(true)}>
+                  + Tilføj symptom...
+                </SymptomPickerRowContainer>
+              )
+            )),
+          ...symptoms
+            .slice()
+            .sort(sorter)
+            .map((s) => <SymptomPickerRow symptom={s} search={search} />)
+        ]}
       </div>
     </div>
   );

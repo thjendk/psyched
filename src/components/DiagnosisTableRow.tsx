@@ -67,12 +67,26 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
     await Diagnosis.removeParent(diagnosis.id, parentId);
   };
 
+  const createExcess = () => {
+    const excess = excessSymptoms.map((s) => (
+      <SymptomTag
+        diagnosis={diagnosis}
+        symptom={s}
+        style={{ backgroundColor: '#870000', color: 'white' }}
+      />
+    ));
+
+    if (excess.length === 0)
+      return <Icon style={{ marginLeft: '5px', alignSelf: 'center' }} name="check" color="green" />;
+    return excess;
+  };
+
   if (isEditing) return <DiagnosisInputRow diagnosis={diagnosis} setEditing={setEditing} />;
   return (
     <>
       <Table.Row>
         <Table.Cell>{diagnosis.name}</Table.Cell>
-        <Table.Cell>{diagnosis.icdCode}</Table.Cell>
+        <Table.Cell textAlign="center">{diagnosis.icdCode}</Table.Cell>
         <Table.Cell>{diagnosis.description}</Table.Cell>
         <Table.Cell>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
@@ -109,13 +123,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
                 <>
                   <Break />
                   <span style={{ alignSelf: 'center' }}>Ikke matchende symptomer: </span>
-                  {excessSymptoms.map((s) => (
-                    <SymptomTag
-                      diagnosis={diagnosis}
-                      symptom={s}
-                      style={{ backgroundColor: '#870000', color: 'white' }}
-                    />
-                  ))}
+                  {createExcess()}
                 </>
               )}
           </div>
@@ -126,33 +134,35 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis }) => 
         </Table.Cell>
         {user && (
           <Table.Cell>
-            <Button onClick={() => setEditing(true)} basic color="orange">
-              Rediger
-            </Button>
-            <Modal
-              open={deleteModal}
-              trigger={
-                <Button onClick={() => setDeleteModal(true)} basic color="red">
-                  Slet
-                </Button>
-              }
-            >
-              <Modal.Header>Vil du slette {diagnosis.name}?</Modal.Header>
-              <Modal.Actions>
-                <Button basic color="black" onClick={() => setDeleteModal(false)}>
-                  <Icon name="close" /> Nej
-                </Button>
-                <Button
-                  loading={isDeleting}
-                  disabled={isDeleting}
-                  basic
-                  color="red"
-                  onClick={handleRemove}
-                >
-                  <Icon name="trash" /> Ja
-                </Button>
-              </Modal.Actions>
-            </Modal>
+            <Button.Group fluid>
+              <Button onClick={() => setEditing(true)} basic color="orange">
+                Rediger
+              </Button>
+              <Modal
+                open={deleteModal}
+                trigger={
+                  <Button onClick={() => setDeleteModal(true)} basic color="red">
+                    Slet
+                  </Button>
+                }
+              >
+                <Modal.Header>Vil du slette {diagnosis.name}?</Modal.Header>
+                <Modal.Actions>
+                  <Button basic color="black" onClick={() => setDeleteModal(false)}>
+                    <Icon name="close" /> Nej
+                  </Button>
+                  <Button
+                    loading={isDeleting}
+                    disabled={isDeleting}
+                    basic
+                    color="red"
+                    onClick={handleRemove}
+                  >
+                    <Icon name="trash" /> Ja
+                  </Button>
+                </Modal.Actions>
+              </Modal>
+            </Button.Group>
           </Table.Cell>
         )}
       </Table.Row>
