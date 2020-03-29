@@ -179,6 +179,24 @@ class Diagnosis {
     });
     store.dispatch(diagnosisReducer.actions.addDiagnosis(diagnosis));
   };
+
+  static updateSymptom = async (diagnosisId: number, symptomId: number, point: number) => {
+    const mutation = gql`
+      mutation UpdateDiagnosisSymptom($diagnosisId: Int, $symptomId: Int, $point: Int) {
+        updateDiagnosisSymptom(diagnosisId: $diagnosisId, symptomId: $symptomId, point: $point) {
+          ...Diagnosis
+        }
+      }
+      ${Diagnosis.fragment}
+    `;
+
+    const diagnosis = await Apollo.mutate<Diagnosis>('updateDiagnosisSymptom', mutation, {
+      diagnosisId,
+      symptomId,
+      point
+    });
+    store.dispatch(diagnosisReducer.actions.addDiagnosis(diagnosis));
+  };
 }
 
 export default Diagnosis;

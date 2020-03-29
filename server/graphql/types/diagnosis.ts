@@ -16,7 +16,7 @@ export const typeDefs = gql`
     addDiagnosisParent(id: Int, parentId: Int): Diagnosis
     removeDiagnosisParent(id: Int, parentId: Int): Diagnosis
     addSymptomToDiagnosis(diagnosisId: Int, symptomId: Int): Diagnosis
-    updateDiagnosisSymptom(dianosisId: Int, symptomId: Int): Diagnosis
+    updateDiagnosisSymptom(diagnosisId: Int, symptomId: Int, point: Int): Diagnosis
     removeSymptomFromDiagnosis(diagnosisId: Int, symptomId: Int): Diagnosis
   }
 
@@ -70,6 +70,12 @@ export const resolvers: Resolvers = {
     },
     addSymptomToDiagnosis: async (root, { symptomId, diagnosisId }, ctx) => {
       await DiagnosisSymptoms.query().insert({ symptomId, diagnosisId, userId: ctx.user.userId });
+      return { id: diagnosisId };
+    },
+    updateDiagnosisSymptom: async (root, { diagnosisId, symptomId, point }) => {
+      await DiagnosisSymptoms.query()
+        .where({ diagnosisId, symptomId })
+        .update({ point });
       return { id: diagnosisId };
     },
     removeSymptomFromDiagnosis: async (root, { symptomId, diagnosisId }) => {

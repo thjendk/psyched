@@ -106,8 +106,9 @@ export type MutationAddSymptomToDiagnosisArgs = {
 
 
 export type MutationUpdateDiagnosisSymptomArgs = {
-  dianosisId?: Maybe<Scalars['Int']>;
+  diagnosisId?: Maybe<Scalars['Int']>;
   symptomId?: Maybe<Scalars['Int']>;
+  point?: Maybe<Scalars['Int']>;
 };
 
 

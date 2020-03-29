@@ -5,15 +5,23 @@ import { Tag } from './DiagnosisTableRow';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import Diagnosis from 'classes/Diagnosis.class';
+import SymptomTagPoints from './SymptomTagPoints';
+import { DiagnosisSymptom } from 'types/generated';
 
 export interface SymptomTagProps {
-  symptom: Symptom;
+  symptom?: Symptom;
+  diagnosisSymptom?: DiagnosisSymptom;
   diagnosis: Diagnosis;
   style?: any;
-  point?: number;
 }
 
-const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom: s, point, diagnosis, style }) => {
+const SymptomTag: React.SFC<SymptomTagProps> = ({
+  symptom,
+  diagnosis,
+  style,
+  diagnosisSymptom
+}) => {
+  const s = symptom || diagnosisSymptom.symptom;
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const user = useSelector((state: ReduxState) => state.auth.user);
   const [modalOpen, setModalOpen] = useState(false);
@@ -31,7 +39,6 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom: s, point, diagnosis, 
     setRemoveLoading(false);
   };
 
-  console.log(point);
   return (
     <Popup
       key={s.id}
@@ -71,7 +78,11 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom: s, point, diagnosis, 
               </Modal.Actions>
             </Modal>
           )}
-          {point && isNotParent && <span style={{ marginLeft: '5px' }}>{point}</span>}
+          <SymptomTagPoints
+            diagnosis={diagnosis}
+            symptom={diagnosisSymptom}
+            isNotParent={isNotParent}
+          />
         </Tag>
       }
     >

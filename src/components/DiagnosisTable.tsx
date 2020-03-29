@@ -61,8 +61,8 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
             <Table.HeaderCell width={4}>Beskrivelse</Table.HeaderCell>
             <Table.HeaderCell style={{ width: '130px' }}>Overdiagnose</Table.HeaderCell>
             <Table.HeaderCell>Symptomer</Table.HeaderCell>
-            <Table.HeaderCell>Antal</Table.HeaderCell>
             <Table.HeaderCell>Opfyldt</Table.HeaderCell>
+            <Table.HeaderCell>Antal</Table.HeaderCell>
             {user && <Table.HeaderCell>Muligheder</Table.HeaderCell>}
           </Table.Row>
         </Table.Header>

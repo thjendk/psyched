@@ -73,19 +73,20 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
   };
 
   const createExcess = () => {
-    const excess = excessSymptoms.map((s) => (
-      <SymptomTag
-        diagnosis={diagnosis}
-        symptom={s}
-        style={{
-          backgroundColor:
-            diagnosis.symptoms.find((symp) => symp.symptom.id === s.id)?.point < 0
-              ? 'red'
-              : '#870000',
-          color: 'white'
-        }}
-      />
-    ));
+    const excess = excessSymptoms.map((s) => {
+      const exists = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
+      return (
+        <SymptomTag
+          diagnosis={diagnosis}
+          symptom={s}
+          diagnosisSymptom={exists}
+          style={{
+            backgroundColor: exists?.point < 0 ? 'red' : '#870000',
+            color: 'white'
+          }}
+        />
+      );
+    });
 
     if (excess.length === 0)
       return <Icon style={{ marginLeft: '5px', alignSelf: 'center' }} name="check" color="green" />;
@@ -148,7 +149,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
             {symptoms
               .slice()
               .sort(sorter)
-              .map((s) => <SymptomTag symptom={s.symptom} point={s.point} diagnosis={diagnosis} />)
+              .map((s) => <SymptomTag diagnosisSymptom={s} diagnosis={diagnosis} />)
               .concat(
                 user &&
                   (adding ? (
