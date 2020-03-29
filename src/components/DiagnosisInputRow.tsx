@@ -49,6 +49,7 @@ const DiagnosisInputRow: React.SFC<DiagnosisInputRowProps> = ({ diagnosis, setEd
       <Table.Cell />
       <Table.Cell />
       <Table.Cell />
+      <Table.Cell />
       <Table.Cell>
         <Button loading={isAdding} disabled={isAdding} onClick={handleSubmit} basic color="blue">
           {diagnosis ? 'Rediger' : 'Tilføj'}
