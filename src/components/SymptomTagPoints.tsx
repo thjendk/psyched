@@ -19,7 +19,7 @@ const SymptomTagPoints: React.SFC<SymptomTagPointsProps> = ({
   const user = useSelector((state: ReduxState) => state.auth.user);
   const ref = useRef(null);
   const [editing, setEditing] = useState(false);
-  const [point, setPoint] = useState(symptom?.point?.toString());
+  const [point, setPoint] = useState(symptom?.point?.toString() || '');
 
   const handleSubmit = async () => {
     if (!point) return setEditing(false);
