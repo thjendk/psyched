@@ -99,7 +99,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
     if (hasConflict)
       return (
         <>
-          <Icon name="close" color="red" /> Konflikt
+          <Icon name="close" color="red" /> Udelukket
         </>
       );
     const sum = keySymptoms.reduce((sum, s) => (sum += s.point), 0);
@@ -127,6 +127,8 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
         <Table.Cell>
           <Highlighter search={search}>{diagnosis.description}</Highlighter>
         </Table.Cell>
+        <Table.Cell></Table.Cell>
+        <Table.Cell></Table.Cell>
         <Table.Cell>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             {diagnosis.parents

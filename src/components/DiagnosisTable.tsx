@@ -24,17 +24,20 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
 
   const sorter = (a: Diagnosis, b: Diagnosis) => {
-    const percentage = (d: Diagnosis) => {
+    const points = (d: Diagnosis) => {
       const selected = totalSymptoms(d).filter(
-        (s) => symptomIds.includes(s.symptom.id) && (!s.point || s.point > 0)
+        (s) => symptomIds.includes(s.symptom.id) && s.point > 0
       );
       if (selected.length === 0) return 0;
+      const selectedSum = selected.reduce((sum, s) => (sum += s.point), 0);
+      const totalSum = totalSymptoms(d).reduce((sum, s) => (sum += s.point), 0);
+      if (selectedSum === 0) return 0;
 
-      return selected.length / totalSymptoms(d).length;
+      return selectedSum / totalSum;
     };
 
-    if (percentage(a) < percentage(b)) return 1;
-    if (percentage(a) > percentage(b)) return -1;
+    if (points(a) < points(b)) return 1;
+    if (points(a) > points(b)) return -1;
     return a.icdCode.localeCompare(b.icdCode);
   };
 
@@ -61,7 +64,9 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
             <Table.HeaderCell>Diagnose</Table.HeaderCell>
             <Table.HeaderCell style={{ width: '70px' }}>ICD-10</Table.HeaderCell>
             <Table.HeaderCell width={4}>Beskrivelse</Table.HeaderCell>
-            <Table.HeaderCell style={{ width: '130px' }}>Overdiagnose</Table.HeaderCell>
+            <Table.HeaderCell style={{ width: '130px' }}>Krævet</Table.HeaderCell>
+            <Table.HeaderCell style={{ width: '130px' }}>Udelukkende</Table.HeaderCell>
+            <Table.HeaderCell style={{ width: '130px' }}>Lignende</Table.HeaderCell>
             <Table.HeaderCell>Symptomer</Table.HeaderCell>
             <Table.HeaderCell>Opfyldt</Table.HeaderCell>
             <Table.HeaderCell>Antal</Table.HeaderCell>

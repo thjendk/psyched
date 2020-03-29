@@ -15,9 +15,6 @@ class Symptom {
       parents {
         id
       }
-      children {
-        id
-      }
     }
   `;
 
@@ -88,6 +85,34 @@ class Symptom {
 
     const result = await Apollo.mutate<number>('removeSymptom', mutation, { id });
     store.dispatch(symptomReducer.actions.removeSymptom(result));
+  };
+
+  static addParent = async (id: number, parentId: number) => {
+    const mutation = gql`
+      mutation AddSymptomParent($id: Int, $parentId: Int) {
+        addSymptomParent(id: $id, parentId: $parentId) {
+          ...Symptom
+        }
+      }
+      ${Symptom.fragment}
+    `;
+
+    const symptom = await Apollo.mutate<Symptom>('addSymptomParent', mutation, { id, parentId });
+    store.dispatch(symptomReducer.actions.addSymptom(symptom));
+  };
+
+  static removeParent = async (id: number, parentId: number) => {
+    const mutation = gql`
+      mutation RemoveSymptomParent($id: Int, $parentId: Int) {
+        removeSymptomParent(id: $id, parentId: $parentId) {
+          ...Symptom
+        }
+      }
+      ${Symptom.fragment}
+    `;
+
+    const symptom = await Apollo.mutate<Symptom>('removeSymptomParent', mutation, { id, parentId });
+    store.dispatch(symptomReducer.actions.addSymptom(symptom));
   };
 }
 

@@ -6,6 +6,8 @@ import Symptom from 'classes/Symptom.class';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import SymptomPickerInput from './SymptomPickerInput';
+import SymptomParentTag from './SymptomParentTag';
+import SymptomParentInput from './SymptomParentInput';
 
 export const SymptomPickerRowContainer = styled.p`
   border: 1px solid lightgrey;
@@ -49,7 +51,7 @@ const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom })
   return (
     <SymptomPickerRowContainer>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div style={{ flexGrow: 1 }} onClick={handlePick}>
+        <div style={{ width: '75%' }} onClick={handlePick}>
           <Highlight search={search}>{symptom.name.toTitleCase()}</Highlight>
           {symptom.description && (
             <>
@@ -60,35 +62,43 @@ const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom })
             </>
           )}
         </div>
-        {user && (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div>
-            <Icon onClick={() => setEditing(true)} name="wrench" color="grey" />
-            {removing ? (
-              <Loader active inline size="tiny" />
-            ) : (
-              <Modal
-                open={modalOpen}
-                trigger={<Icon name="close" onClick={() => setModalOpen(true)} color="grey" />}
-              >
-                <Modal.Header>Vil du slette {symptom.name}?</Modal.Header>
-                <Modal.Actions>
-                  <Button onClick={() => setModalOpen(false)} basic color="black">
-                    <Icon name="close" /> Nej
-                  </Button>
-                  <Button
-                    loading={removing}
-                    disabled={removing}
-                    onClick={handleRemove}
-                    basic
-                    color="red"
-                  >
-                    <Icon name="trash" /> Ja
-                  </Button>
-                </Modal.Actions>
-              </Modal>
-            )}
+            {[
+              symptom.parents.length === 0 && <SymptomParentInput symptom={symptom} />,
+              symptom.parents.map((p) => <SymptomParentTag symptom={symptom} parentId={p.id} />)
+            ]}
           </div>
-        )}
+          {user && (
+            <div style={{ marginLeft: '10px' }}>
+              <Icon onClick={() => setEditing(true)} name="wrench" color="grey" />
+              {removing ? (
+                <Loader active inline size="tiny" />
+              ) : (
+                <Modal
+                  open={modalOpen}
+                  trigger={<Icon name="close" onClick={() => setModalOpen(true)} color="grey" />}
+                >
+                  <Modal.Header>Vil du slette {symptom.name}?</Modal.Header>
+                  <Modal.Actions>
+                    <Button onClick={() => setModalOpen(false)} basic color="black">
+                      <Icon name="close" /> Nej
+                    </Button>
+                    <Button
+                      loading={removing}
+                      disabled={removing}
+                      onClick={handleRemove}
+                      basic
+                      color="red"
+                    >
+                      <Icon name="trash" /> Ja
+                    </Button>
+                  </Modal.Actions>
+                </Modal>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </SymptomPickerRowContainer>
   );

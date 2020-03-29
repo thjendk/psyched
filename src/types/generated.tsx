@@ -55,7 +55,8 @@ export type Mutation = {
   createSymptom?: Maybe<Symptom>;
   updateSymptom?: Maybe<Symptom>;
   removeSymptom?: Maybe<Scalars['Int']>;
-  addSymptomChild?: Maybe<Symptom>;
+  addSymptomParent?: Maybe<Symptom>;
+  removeSymptomParent?: Maybe<Symptom>;
 };
 
 
@@ -132,9 +133,15 @@ export type MutationRemoveSymptomArgs = {
 };
 
 
-export type MutationAddSymptomChildArgs = {
+export type MutationAddSymptomParentArgs = {
   id?: Maybe<Scalars['Int']>;
-  childId?: Maybe<Scalars['Int']>;
+  parentId?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationRemoveSymptomParentArgs = {
+  id?: Maybe<Scalars['Int']>;
+  parentId?: Maybe<Scalars['Int']>;
 };
 
 export type Query = {

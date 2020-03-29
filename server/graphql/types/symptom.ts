@@ -12,7 +12,8 @@ export const typeDefs = gql`
     createSymptom(data: SymptomInput): Symptom
     updateSymptom(id: Int, data: SymptomInput): Symptom
     removeSymptom(id: Int): Int
-    addSymptomChild(id: Int, childId: Int): Symptom
+    addSymptomParent(id: Int, parentId: Int): Symptom
+    removeSymptomParent(id: Int, parentId: Int): Symptom
   }
 
   type Symptom {
@@ -51,6 +52,16 @@ export const resolvers: Resolvers = {
     removeSymptom: async (root, { id }) => {
       await Symptoms.query().deleteById(id);
       return id;
+    },
+    addSymptomParent: async (root, { id, parentId }, ctx) => {
+      await SymptomParent.query().insert({ symptomId: id, parentId, userId: ctx.user.userId });
+      return { id };
+    },
+    removeSymptomParent: async (root, { id, parentId }) => {
+      await SymptomParent.query()
+        .where({ symptomId: id, parentId })
+        .delete();
+      return { id };
     }
   },
 

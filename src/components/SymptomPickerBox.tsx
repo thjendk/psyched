@@ -5,6 +5,7 @@ import SymptomPickerInput from './SymptomPickerInput';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import SymptomPickerRow, { SymptomPickerRowContainer } from './SymptomPickerRow';
+import _ from 'lodash';
 
 export interface SymptomPickerBoxProps {
   symptoms: Symptom[];
@@ -20,6 +21,10 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
       s.name.toLowerCase().includes(search.toLowerCase()) ||
       s.description?.toLowerCase().includes(search.toLowerCase())
   );
+  const groupedSymptoms = _(symptoms)
+    .sortBy((s) => s.parents[0]?.id)
+    .groupBy((s) => symptoms.find((symp) => symp.id === s.parents[0]?.id)?.name || 'Ikke grupperet')
+    .value();
 
   const sorter = (a: Symptom, b: Symptom) => {
     return a.name.localeCompare(b.name);
@@ -46,10 +51,19 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
                 </SymptomPickerRowContainer>
               )
             )),
-          ...symptoms
-            .slice()
-            .sort(sorter)
-            .map((s) => <SymptomPickerRow symptom={s} search={search} />)
+          ..._.map(groupedSymptoms, (symptoms, groupName) => (
+            <>
+              <SymptomPickerRowContainer style={{ fontWeight: 'bold', textAlign: 'center' }}>
+                {groupName}
+              </SymptomPickerRowContainer>
+              {symptoms
+                .slice()
+                .sort(sorter)
+                .map((s) => (
+                  <SymptomPickerRow symptom={s} search={search} />
+                ))}
+            </>
+          ))
         ]}
       </div>
     </div>
