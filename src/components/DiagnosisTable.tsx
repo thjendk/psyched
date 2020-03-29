@@ -25,7 +25,9 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
 
   const sorter = (a: Diagnosis, b: Diagnosis) => {
     const percentage = (d: Diagnosis) => {
-      const selected = totalSymptoms(d).filter((s) => symptomIds.includes(s.symptom.id));
+      const selected = totalSymptoms(d).filter(
+        (s) => symptomIds.includes(s.symptom.id) && (!s.point || s.point > 0)
+      );
       if (selected.length === 0) return 0;
 
       return selected.length / totalSymptoms(d).length;
