@@ -5,24 +5,24 @@ import { Dropdown } from 'semantic-ui-react';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 
-export interface DiagnosisParentInputProps {
+export interface DiagnosisExcludingInputProps {
   diagnosis: Diagnosis;
 }
 
-const DiagnosisParentInput: React.SFC<DiagnosisParentInputProps> = ({ diagnosis }) => {
+const DiagnosisExcludingInput: React.SFC<DiagnosisExcludingInputProps> = ({ diagnosis }) => {
   const [adding, setAdding] = useState(false);
   const [value, setValue] = useState<number>(null);
   const [submitting, setSubmitting] = useState(false);
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
   const diagnosisOptions = diagnoses
-    .filter((d) => !diagnosis.parents.map((p) => p.id).includes(d.id))
+    .filter((d) => !diagnosis.excluding.map((p) => p.id).includes(d.id))
     .map((d) => ({ text: d.name, value: d.id, key: d.id }));
   const ref = useRef(null);
 
   const handleSubmit = async () => {
     if (!value) return setAdding(false);
     setSubmitting(true);
-    await Diagnosis.addParent(diagnosis.id, value);
+    await Diagnosis.addExcluding(diagnosis.id, value);
     setSubmitting(false);
   };
 
@@ -47,7 +47,7 @@ const DiagnosisParentInput: React.SFC<DiagnosisParentInputProps> = ({ diagnosis 
         clearable
       />
     );
-  return <Tag onClick={() => setAdding(true)}>+ Tilføj parent</Tag>;
+  return <Tag onClick={() => setAdding(true)}>+ Tilføj udelukkende</Tag>;
 };
 
-export default DiagnosisParentInput;
+export default DiagnosisExcludingInput;

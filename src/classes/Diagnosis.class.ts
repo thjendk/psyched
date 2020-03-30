@@ -26,6 +26,12 @@ class Diagnosis {
       children {
         id
       }
+      excluding {
+        id
+      }
+      including {
+        id
+      }
     }
     ${Symptom.fragment}
   `;
@@ -195,6 +201,82 @@ class Diagnosis {
       symptomId,
       point
     });
+    store.dispatch(diagnosisReducer.actions.addDiagnosis(diagnosis));
+  };
+
+  static addExcluding = async (diagnosisId: number, excludingId: number) => {
+    const mutation = gql`
+      mutation AddExcludingDiagnosisToDiagnosis($diagnosisId: Int, $excludingId: Int) {
+        addExcludingDiagnosisToDiagnosis(diagnosisId: $diagnosisId, excludingId: $excludingId) {
+          ...Diagnosis
+        }
+      }
+      ${Diagnosis.fragment}
+    `;
+
+    const diagnosis = await Apollo.mutate<Diagnosis>('addExcludingDiagnosisToDiagnosis', mutation, {
+      diagnosisId,
+      excludingId
+    });
+    store.dispatch(diagnosisReducer.actions.addDiagnosis(diagnosis));
+  };
+
+  static removeExcluding = async (diagnosisId: number, excludingId: number) => {
+    const mutation = gql`
+      mutation RemoveExcludingDiagnosisFromDiagnosis($diagnosisId: Int, $excludingId: Int) {
+        removeExcludingDiagnosisFromDiagnosis(
+          diagnosisId: $diagnosisId
+          excludingId: $excludingId
+        ) {
+          ...Diagnosis
+        }
+      }
+      ${Diagnosis.fragment}
+    `;
+
+    const diagnosis = await Apollo.mutate<Diagnosis>(
+      'removeExcludingDiagnosisFromDiagnosis',
+      mutation,
+      { diagnosisId, excludingId }
+    );
+    store.dispatch(diagnosisReducer.actions.addDiagnosis(diagnosis));
+  };
+
+  static addIncluding = async (diagnosisId: number, includingId: number) => {
+    const mutation = gql`
+      mutation AddIncludingDiagnosisToDiagnosis($diagnosisId: Int, $includingId: Int) {
+        addIncludingDiagnosisToDiagnosis(diagnosisId: $diagnosisId, includingId: $includingId) {
+          ...Diagnosis
+        }
+      }
+      ${Diagnosis.fragment}
+    `;
+
+    const diagnosis = await Apollo.mutate<Diagnosis>('addIncludingDiagnosisToDiagnosis', mutation, {
+      diagnosisId,
+      includingId
+    });
+    store.dispatch(diagnosisReducer.actions.addDiagnosis(diagnosis));
+  };
+
+  static removeIncluding = async (diagnosisId: number, includingId: number) => {
+    const mutation = gql`
+      mutation RemoveIncludingDiagnosisFromDiagnosis($diagnosisId: Int, $includingId: Int) {
+        removeIncludingDiagnosisFromDiagnosis(
+          diagnosisId: $diagnosisId
+          includingId: $includingId
+        ) {
+          ...Diagnosis
+        }
+      }
+      ${Diagnosis.fragment}
+    `;
+
+    const diagnosis = await Apollo.mutate<Diagnosis>(
+      'removeIncludingDiagnosisFromDiagnosis',
+      mutation,
+      { diagnosisId, includingId }
+    );
     store.dispatch(diagnosisReducer.actions.addDiagnosis(diagnosis));
   };
 }

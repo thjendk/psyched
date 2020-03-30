@@ -54,7 +54,7 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
           ..._.map(groupedSymptoms, (symptoms, groupName) => (
             <>
               <SymptomPickerRowContainer style={{ fontWeight: 'bold', textAlign: 'center' }}>
-                {groupName}
+                {groupName.toTitleCase()}
               </SymptomPickerRowContainer>
               {symptoms
                 .slice()

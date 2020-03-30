@@ -11,6 +11,8 @@ import SymptomTag from './SymptomTag';
 import { totalSymptoms } from 'utils/utils';
 import Highlighter from 'react-highlighter';
 import { DiagnosisSymptom } from 'types/generated';
+import DiagnosisIncludingInput from './DiagnosisIncludingInput';
+import DiagnosisExcludingInput from './DiagnosisExcludingInput';
 
 const Break = styled.div`
   flex-basis: 100%;
@@ -46,15 +48,14 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
   const [isEditing, setEditing] = useState(false);
   const user = useSelector((state: ReduxState) => state.auth.user);
   const allSymptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
-  const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
+  const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
   const symptoms = totalSymptoms(diagnosis).filter((s) => s.point > 0 || !s.point);
-  console.log(symptoms);
   const pickedSymptoms = symptoms.filter(
-    (s) => symptomIds.includes(s.symptom.id) && (s.point > 0 || !s.point)
+    (s) => selectedIds.includes(s.symptom.id) && (s.point > 0 || !s.point)
   );
   const excessSymptoms = allSymptoms.filter(
-    (symp) => !symptoms.map((s) => s.symptom.id).includes(symp.id) && symptomIds.includes(symp.id)
+    (symp) => !symptoms.map((s) => s.symptom.id).includes(symp.id) && selectedIds.includes(symp.id)
   );
 
   const sorter = (a: DiagnosisSymptom, b: DiagnosisSymptom) => {
@@ -70,6 +71,14 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
 
   const handleRemoveParent = async (parentId: number) => {
     await Diagnosis.removeParent(diagnosis.id, parentId);
+  };
+
+  const handleRemoveExcluding = async (excludingId: number) => {
+    await Diagnosis.removeExcluding(diagnosis.id, excludingId);
+  };
+
+  const handleRemoveIncluding = async (includingId: number) => {
+    await Diagnosis.removeIncluding(diagnosis.id, includingId);
   };
 
   const createExcess = () => {
@@ -93,16 +102,34 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
     return excess;
   };
 
+  const isAchieved = (d: Diagnosis) => {
+    const diagnosis = diagnoses.find((diag) => diag.id === d.id);
+    if (hasConflict(diagnosis)) return false;
+    const sum = keySymptoms(diagnosis).reduce((sum, s) => (sum += s.point), 0);
+    return sum >= 100;
+  };
+
   const createAchieved = () => {
-    const keySymptoms = diagnosis.symptoms.filter((s) => symptomIds.includes(s.symptom.id));
-    const hasConflict = keySymptoms.some((s) => s.point < 0);
-    if (hasConflict)
+    const sum = keySymptoms(diagnosis).reduce((sum, s) => (sum += s.point), 0);
+    const missing = diagnosis.including.filter((d) => !isAchieved(d));
+    const conflicting = diagnosis.excluding.filter((d) => isAchieved(d));
+    if (hasConflict(diagnosis))
       return (
         <>
-          <Icon name="close" color="red" /> Udelukket
+          <Icon name="close" color="red" />
+          <br />
+          Udelukket grundet{' '}
+          {missing.length > 0 &&
+            'mangel på ' +
+              missing
+                .map((d) => diagnoses.find((diag) => diag.id === d.id).name.toLowerCase())
+                .join(', ')}
+          {missing.length > 0 && conflicting.length > 0 && ' og '}
+          {conflicting.length > 0 &&
+            'modstridende ' +
+              conflicting.map((d) => diagnoses.find((diag) => diag.id === d.id).name.toLowerCase())}
         </>
       );
-    const sum = keySymptoms.reduce((sum, s) => (sum += s.point), 0);
     return sum >= 100 ? (
       <>
         <Icon name="check" color="green" /> {sum}
@@ -112,6 +139,16 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
         <Icon name="close" color="red" /> {sum}
       </>
     );
+  };
+
+  const hasConflict = (d: Diagnosis) => {
+    if (d.excluding.some((d) => isAchieved(d)) || d.including.some((d) => !isAchieved(d)))
+      return true;
+    return keySymptoms(d).some((s) => s.point < 0);
+  };
+
+  const keySymptoms = (d: Diagnosis) => {
+    return d.symptoms.filter((s) => selectedIds.includes(s.symptom.id));
   };
 
   if (isEditing) return <DiagnosisInputRow diagnosis={diagnosis} setEditing={setEditing} />;
@@ -127,13 +164,45 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
         <Table.Cell>
           <Highlighter search={search}>{diagnosis.description}</Highlighter>
         </Table.Cell>
-        <Table.Cell></Table.Cell>
-        <Table.Cell></Table.Cell>
+        <Table.Cell>
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {diagnosis.including
+              .map((i) => (
+                <Tag active={isAchieved(i)}>
+                  {diagnoses.find((d) => d.id === i.id).name}
+                  {user && (
+                    <>
+                      {' '}
+                      <Icon onClick={() => handleRemoveIncluding(i.id)} name="close" color="grey" />
+                    </>
+                  )}
+                </Tag>
+              ))
+              .concat(user && <DiagnosisIncludingInput diagnosis={diagnosis} />)}
+          </div>
+        </Table.Cell>
+        <Table.Cell>
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {diagnosis.excluding
+              .map((e) => (
+                <Tag active={isAchieved(e)}>
+                  {diagnoses.find((d) => d.id === e.id).name}
+                  {user && (
+                    <>
+                      {' '}
+                      <Icon onClick={() => handleRemoveExcluding(e.id)} name="close" color="grey" />
+                    </>
+                  )}
+                </Tag>
+              ))
+              .concat(user && <DiagnosisExcludingInput diagnosis={diagnosis} />)}
+          </div>
+        </Table.Cell>
         <Table.Cell>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             {diagnosis.parents
               .map((p) => (
-                <Tag>
+                <Tag active={isAchieved(p)}>
                   {diagnoses.find((d) => d.id === p.id).name}
                   {user && (
                     <>

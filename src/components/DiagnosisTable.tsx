@@ -48,10 +48,10 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
   if (!diagnoses) return <LoadingPage />;
   return (
     <div style={{ marginTop: '1em' }}>
-      <Table celled size="small">
+      <Table compact celled size="small">
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell colSpan={user ? 8 : 7}>
+            <Table.HeaderCell colSpan={user ? 10 : 9}>
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}

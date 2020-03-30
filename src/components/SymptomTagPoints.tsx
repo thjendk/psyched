@@ -29,7 +29,6 @@ const SymptomTagPoints: React.SFC<SymptomTagPointsProps> = ({
     setEditing(false);
   };
 
-  console.log(point);
   useEffect(() => {
     ref.current?.focus();
   }, [editing]);

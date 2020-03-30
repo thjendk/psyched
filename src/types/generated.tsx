@@ -24,6 +24,8 @@ export type Diagnosis = {
   symptoms?: Maybe<Array<Maybe<DiagnosisSymptom>>>;
   parents?: Maybe<Array<Maybe<Diagnosis>>>;
   children?: Maybe<Array<Maybe<Diagnosis>>>;
+  excluding?: Maybe<Array<Maybe<Diagnosis>>>;
+  including?: Maybe<Array<Maybe<Diagnosis>>>;
 };
 
 export type DiagnosisInput = {
@@ -52,6 +54,10 @@ export type Mutation = {
   addSymptomToDiagnosis?: Maybe<Diagnosis>;
   updateDiagnosisSymptom?: Maybe<Diagnosis>;
   removeSymptomFromDiagnosis?: Maybe<Diagnosis>;
+  addExcludingDiagnosisToDiagnosis?: Maybe<Diagnosis>;
+  removeExcludingDiagnosisFromDiagnosis?: Maybe<Diagnosis>;
+  addIncludingDiagnosisToDiagnosis?: Maybe<Diagnosis>;
+  removeIncludingDiagnosisFromDiagnosis?: Maybe<Diagnosis>;
   createSymptom?: Maybe<Symptom>;
   updateSymptom?: Maybe<Symptom>;
   removeSymptom?: Maybe<Scalars['Int']>;
@@ -114,6 +120,30 @@ export type MutationUpdateDiagnosisSymptomArgs = {
 export type MutationRemoveSymptomFromDiagnosisArgs = {
   diagnosisId?: Maybe<Scalars['Int']>;
   symptomId?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationAddExcludingDiagnosisToDiagnosisArgs = {
+  diagnosisId?: Maybe<Scalars['Int']>;
+  excludingId?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationRemoveExcludingDiagnosisFromDiagnosisArgs = {
+  diagnosisId?: Maybe<Scalars['Int']>;
+  excludingId?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationAddIncludingDiagnosisToDiagnosisArgs = {
+  diagnosisId?: Maybe<Scalars['Int']>;
+  includingId?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationRemoveIncludingDiagnosisFromDiagnosisArgs = {
+  diagnosisId?: Maybe<Scalars['Int']>;
+  includingId?: Maybe<Scalars['Int']>;
 };
 
 

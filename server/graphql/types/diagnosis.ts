@@ -3,6 +3,8 @@ import { Resolvers } from 'types/resolvers-types';
 import Diagnoses from 'models/diagnoses.model';
 import DiagnosisSymptoms from 'models/diagnosisSymptoms.model';
 import DiagnosisParent from 'models/diagnosesParents.model';
+import DiagnosisExcluding from 'models/diagnosesExcluding.model';
+import DiagnosisIncluding from 'models/diagnosesIncluding.model';
 
 export const typeDefs = gql`
   extend type Query {
@@ -18,6 +20,10 @@ export const typeDefs = gql`
     addSymptomToDiagnosis(diagnosisId: Int, symptomId: Int): Diagnosis
     updateDiagnosisSymptom(diagnosisId: Int, symptomId: Int, point: Int): Diagnosis
     removeSymptomFromDiagnosis(diagnosisId: Int, symptomId: Int): Diagnosis
+    addExcludingDiagnosisToDiagnosis(diagnosisId: Int, excludingId: Int): Diagnosis
+    removeExcludingDiagnosisFromDiagnosis(diagnosisId: Int, excludingId: Int): Diagnosis
+    addIncludingDiagnosisToDiagnosis(diagnosisId: Int, includingId: Int): Diagnosis
+    removeIncludingDiagnosisFromDiagnosis(diagnosisId: Int, includingId: Int): Diagnosis
   }
 
   type Diagnosis {
@@ -28,6 +34,8 @@ export const typeDefs = gql`
     symptoms: [DiagnosisSymptom]
     parents: [Diagnosis]
     children: [Diagnosis]
+    excluding: [Diagnosis]
+    including: [Diagnosis]
   }
 
   input DiagnosisInput {
@@ -93,6 +101,26 @@ export const resolvers: Resolvers = {
         .where({ diagnosisId: id, parentId, userId: ctx.user.userId })
         .delete();
       return { id };
+    },
+    addExcludingDiagnosisToDiagnosis: async (root, { diagnosisId, excludingId }) => {
+      await DiagnosisExcluding.query().insert({ diagnosisId, excludingId });
+      return { id: diagnosisId };
+    },
+    removeExcludingDiagnosisFromDiagnosis: async (root, { diagnosisId, excludingId }) => {
+      await DiagnosisExcluding.query()
+        .where({ diagnosisId, excludingId })
+        .delete();
+      return { id: diagnosisId };
+    },
+    addIncludingDiagnosisToDiagnosis: async (root, { diagnosisId, includingId }) => {
+      await DiagnosisIncluding.query().insert({ diagnosisId, includingId });
+      return { id: diagnosisId };
+    },
+    removeIncludingDiagnosisFromDiagnosis: async (root, { diagnosisId, includingId }) => {
+      await DiagnosisIncluding.query()
+        .where({ diagnosisId, includingId })
+        .delete();
+      return { id: diagnosisId };
     }
   },
 
@@ -121,6 +149,14 @@ export const resolvers: Resolvers = {
     children: async ({ id }) => {
       const parents = await DiagnosisParent.query().where({ parentId: id });
       return parents.map((p) => ({ id: p.diagnosisId }));
+    },
+    excluding: async ({ id }) => {
+      const excluding = await DiagnosisExcluding.query().where({ diagnosisId: id });
+      return excluding.map((d) => ({ id: d.excludingId }));
+    },
+    including: async ({ id }) => {
+      const including = await DiagnosisIncluding.query().where({ diagnosisId: id });
+      return including.map((d) => ({ id: d.includingId }));
     }
   }
 };
