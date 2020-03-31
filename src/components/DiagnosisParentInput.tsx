@@ -47,7 +47,7 @@ const DiagnosisParentInput: React.SFC<DiagnosisParentInputProps> = ({ diagnosis 
         clearable
       />
     );
-  return <Tag onClick={() => setAdding(true)}>+ Tilføj parent</Tag>;
+  return <Tag onClick={() => setAdding(true)}>+ Tilføj lignende</Tag>;
 };
 
 export default DiagnosisParentInput;

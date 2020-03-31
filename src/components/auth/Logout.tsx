@@ -8,7 +8,7 @@ const Logout: React.FC<LogoutProps> = ({ history }) => {
   useEffect(() => {
     const logout = async () => {
       await User.logout();
-      history.push('/login');
+      history.push('/');
     };
     logout();
   }, [history]);

@@ -24,6 +24,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
   const s = symptom || diagnosisSymptom.symptom;
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const user = useSelector((state: ReduxState) => state.auth.user);
+  const symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
   const [modalOpen, setModalOpen] = useState(false);
   const [removeLoading, setRemoveLoading] = useState(false);
   const isNotParent = diagnosis.symptoms.map((s) => s.symptom.id).includes(s.id);
@@ -83,6 +84,19 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
             symptom={diagnosisSymptom}
             isNotParent={isNotParent}
           />
+          <div style={{ display: 'flex', justifyContent: 'space-apart', flexWrap: 'wrap' }}>
+            {s.children.map((s) => {
+              const chosenChild = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
+              if (!!chosenChild)
+                return <SymptomTag diagnosisSymptom={chosenChild} diagnosis={diagnosis} />;
+              if (isNotParent) {
+                const symptom = symptoms.find((symp) => symp.id === s.id);
+                return <SymptomTag symptom={symptom} diagnosis={diagnosis} />;
+              }
+              if (!chosenChild || chosenChild.point < 0) return null;
+              return null;
+            })}
+          </div>
         </Tag>
       }
     >

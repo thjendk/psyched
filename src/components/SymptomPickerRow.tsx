@@ -65,7 +65,7 @@ const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom })
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div>
             {[
-              symptom.parents.length === 0 && <SymptomParentInput symptom={symptom} />,
+              user && symptom.parents.length === 0 && <SymptomParentInput symptom={symptom} />,
               symptom.parents.map((p) => <SymptomParentTag symptom={symptom} parentId={p.id} />)
             ]}
           </div>

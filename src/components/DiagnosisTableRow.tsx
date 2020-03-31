@@ -23,9 +23,10 @@ const Break = styled.div`
 
 export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
   border-radius: 5px;
-  background-color: ${(props) => (props.active ? '#0089e0' : props.notParent ? '#ffdd8f' : null)};
+  background-color: ${(props) =>
+    props.active ? '#0089e0' : props.notParent ? '#ffdd8f' : 'white'};
   padding: 3px 10px;
-  color: ${(props) => (props.active ? 'white' : null)};
+  color: ${(props) => (props.active ? 'white' : 'black')};
   margin-left: 5px;
   margin-top: 5px;
   cursor: pointer;
@@ -51,6 +52,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
   const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
   const symptoms = totalSymptoms(diagnosis).filter((s) => s.point > 0 || !s.point);
+  const shownSymptoms = symptoms.filter((s) => s.symptom.parents.length === 0);
   const pickedSymptoms = symptoms.filter(
     (s) => selectedIds.includes(s.symptom.id) && (s.point > 0 || !s.point)
   );
@@ -111,23 +113,14 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
 
   const createAchieved = () => {
     const sum = keySymptoms(diagnosis).reduce((sum, s) => (sum += s.point), 0);
-    const missing = diagnosis.including.filter((d) => !isAchieved(d));
-    const conflicting = diagnosis.excluding.filter((d) => isAchieved(d));
     if (hasConflict(diagnosis))
       return (
         <>
           <Icon name="close" color="red" />
           <br />
-          Udelukket grundet{' '}
-          {missing.length > 0 &&
-            'mangel på ' +
-              missing
-                .map((d) => diagnoses.find((diag) => diag.id === d.id).name.toLowerCase())
-                .join(', ')}
-          {missing.length > 0 && conflicting.length > 0 && ' og '}
-          {conflicting.length > 0 &&
-            'modstridende ' +
-              conflicting.map((d) => diagnoses.find((diag) => diag.id === d.id).name.toLowerCase())}
+          Udelukket grundet konflikt.
+          <br />
+          {sum}
         </>
       );
     return sum >= 100 ? (
@@ -142,7 +135,11 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
   };
 
   const hasConflict = (d: Diagnosis) => {
-    if (d.excluding.some((d) => isAchieved(d)) || d.including.some((d) => !isAchieved(d)))
+    if (
+      d.excluding.some((d) => isAchieved(d)) ||
+      d.including.some((d) => !isAchieved(d)) ||
+      d.symptoms.filter((s) => selectedIds.includes(s.symptom.id)).some((s) => s.point < 0)
+    )
       return true;
     return keySymptoms(d).some((s) => s.point < 0);
   };
@@ -216,11 +213,13 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
           </div>
         </Table.Cell>
         <Table.Cell>
-          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-            {symptoms
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+            {shownSymptoms
               .slice()
               .sort(sorter)
-              .map((s) => <SymptomTag diagnosisSymptom={s} diagnosis={diagnosis} />)
+              .map((s: DiagnosisSymptom) => (
+                <SymptomTag diagnosisSymptom={s} diagnosis={diagnosis} />
+              ))
               .concat(
                 user &&
                   (adding ? (
@@ -240,8 +239,12 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
         </Table.Cell>
         <Table.Cell textAlign="center">{createAchieved()}</Table.Cell>
         <Table.Cell>
-          {pickedSymptoms.length} / {symptoms.length} (
-          {((pickedSymptoms.length / symptoms.length) * 100).toFixed(0)} %)
+          {pickedSymptoms.length} / {symptoms.filter((s) => !s.point || s.point > 0).length} (
+          {(
+            (pickedSymptoms.length / symptoms.filter((s) => !s.point || s.point > 0).length) *
+            100
+          ).toFixed(0)}{' '}
+          %)
         </Table.Cell>
         {user && (
           <Table.Cell>

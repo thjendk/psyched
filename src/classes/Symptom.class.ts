@@ -15,6 +15,9 @@ class Symptom {
       parents {
         id
       }
+      children {
+        id
+      }
     }
   `;
 
