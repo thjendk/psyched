@@ -64,6 +64,6 @@ export const colors = {
   },
   parent: {
     color: 'white',
-    description: 'Tilhører lignende diagnose'
+    description: 'Tilhører lignende diagnose, eller symptomgruppe valgt specifikt'
   }
 };
