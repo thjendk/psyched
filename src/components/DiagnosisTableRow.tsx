@@ -31,6 +31,7 @@ export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
   margin-top: 5px;
   cursor: pointer;
   border: ${(props) => (props.active ? null : '1px dashed black')};
+  white-space: nowrap;
 
   :hover {
     border: 1px solid black;
@@ -240,8 +241,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
           {symptoms.filter((s) => !s.point || s.point > 0).length} (
           {(
             (chosenSymptoms(diagnosis).length /
-              symptoms.filter((s) => !s.point || s.point > 0).length) *
-            100
+              symptoms.filter((s) => !s.point || s.point > 0).length || 0) * 100
           ).toFixed(0)}{' '}
           %)
         </Table.Cell>

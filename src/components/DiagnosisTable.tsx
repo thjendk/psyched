@@ -50,8 +50,8 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
 
   if (!diagnoses) return <LoadingPage />;
   return (
-    <div style={{ marginTop: '1em' }}>
-      <Table compact celled size="small">
+    <div style={{ marginTop: '1em', overflowX: 'auto' }}>
+      <Table celled size="small">
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell colSpan={user ? 10 : 9}>

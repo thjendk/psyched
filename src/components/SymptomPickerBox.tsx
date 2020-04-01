@@ -23,7 +23,7 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
   );
   const groupedSymptoms = _(symptoms)
     .sortBy((s) => s.parents[0]?.id)
-    .groupBy((s) => symptoms.find((symp) => symp.id === s.parents[0]?.id)?.name || 'Ikke grupperet')
+    .groupBy((s) => symptoms.find((symp) => symp.id === s.parents[0]?.id)?.id)
     .value();
 
   const sorter = (a: Symptom, b: Symptom) => {
@@ -51,19 +51,26 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
                 </SymptomPickerRowContainer>
               )
             )),
-          ..._.map(groupedSymptoms, (symptoms, groupName) => (
-            <>
-              <SymptomPickerRowContainer style={{ fontWeight: 'bold', textAlign: 'center' }}>
-                {groupName.toTitleCase()}
-              </SymptomPickerRowContainer>
-              {symptoms
-                .slice()
-                .sort(sorter)
-                .map((s) => (
-                  <SymptomPickerRow symptom={s} search={search} />
-                ))}
-            </>
-          ))
+          ..._.map(groupedSymptoms, (groupSymptoms, groupId) => {
+            const groupSymptom = symptoms.find((s) => s.id === Number(groupId));
+
+            return (
+              <>
+                {groupSymptom && <SymptomPickerRow symptom={groupSymptom} search={search} header />}
+                {!groupSymptom && (
+                  <SymptomPickerRowContainer style={{ fontWeight: 'bold', textAlign: 'center' }}>
+                    Ikke grupperet
+                  </SymptomPickerRowContainer>
+                )}
+                {groupSymptoms
+                  .slice()
+                  .sort(sorter)
+                  .map((s) => (
+                    <SymptomPickerRow symptom={s} search={search} />
+                  ))}
+              </>
+            );
+          })
         ]}
       </div>
     </div>

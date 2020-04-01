@@ -28,9 +28,10 @@ export const SymptomPickerRowContainer = styled.p`
 export interface SymptomPickerRowProps {
   search: string;
   symptom: Symptom;
+  header?: boolean;
 }
 
-const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom }) => {
+const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom, header }) => {
   const user = useSelector((state: ReduxState) => state.auth.user);
   const [removing, setRemoving] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -50,9 +51,14 @@ const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom })
   if (editing) return <SymptomPickerInput symptom={symptom} setEditing={setEditing} />;
   return (
     <SymptomPickerRowContainer>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div style={{ width: '75%' }} onClick={handlePick}>
-          <Highlight search={search}>{symptom.name.toTitleCase()}</Highlight>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div
+          onClick={handlePick}
+          style={!header ? { width: '100%' } : { width: '100%', textAlign: 'center' }}
+        >
+          <Highlight style={header ? { fontWeight: 'bold' } : null} search={search}>
+            {symptom.name.toTitleCase()}
+          </Highlight>
           {symptom.description && (
             <>
               <br />
@@ -62,7 +68,12 @@ const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom })
             </>
           )}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+        >
           <div>
             {[
               user && symptom.parents.length === 0 && <SymptomParentInput symptom={symptom} />,
@@ -70,7 +81,7 @@ const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom })
             ]}
           </div>
           {user && (
-            <div style={{ marginLeft: '10px' }}>
+            <div style={{ marginLeft: '10px', whiteSpace: 'nowrap' }}>
               <Icon onClick={() => setEditing(true)} name="wrench" color="grey" />
               {removing ? (
                 <Loader active inline size="tiny" />
