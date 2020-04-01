@@ -8,7 +8,7 @@ import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
 import DiagnosisParentInput from './DiagnosisParentInput';
 import SymptomTag from './SymptomTag';
-import { totalSymptoms } from 'utils/utils';
+import { totalSymptoms, pointSum } from 'utils/utils';
 import Highlighter from 'react-highlighter';
 import { DiagnosisSymptom } from 'types/generated';
 import DiagnosisIncludingInput from './DiagnosisIncludingInput';
@@ -110,7 +110,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
   };
 
   const createAchieved = () => {
-    const sum = chosenSymptoms(diagnosis).reduce((sum, s) => (sum += s?.point || 0), 0);
+    const sum = pointSum(diagnosis);
     if (hasConflict(diagnosis))
       return (
         <>

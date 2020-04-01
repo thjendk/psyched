@@ -13,6 +13,7 @@ export interface SymptomPickerBoxProps {
 }
 
 const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) => {
+  const allSymptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
   const [adding, setAdding] = useState(false);
   const [search, setSearch] = useState('');
   const user = useSelector((state: ReduxState) => state.auth.user);
@@ -23,7 +24,7 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
   );
   const groupedSymptoms = _(symptoms)
     .sortBy((s) => s.parents[0]?.id)
-    .groupBy((s) => symptoms.find((symp) => symp.id === s.parents[0]?.id)?.id)
+    .groupBy((s) => s.parents[0]?.id)
     .value();
 
   const sorter = (a: Symptom, b: Symptom) => {
@@ -52,7 +53,7 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
               )
             )),
           ..._.map(groupedSymptoms, (groupSymptoms, groupId) => {
-            const groupSymptom = symptoms.find((s) => s.id === Number(groupId));
+            const groupSymptom = allSymptoms.find((s) => s.id === Number(groupId));
 
             return (
               <>

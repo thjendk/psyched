@@ -6,7 +6,7 @@ import { ReduxState } from 'redux/reducers';
 import LoadingPage from './misc/LoadingPage';
 import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
-import { totalSymptoms } from 'utils/utils';
+import { totalSymptoms, pointSum } from 'utils/utils';
 
 export interface DiagnosisTableProps {}
 
@@ -25,12 +25,8 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
 
   const sorter = (a: Diagnosis, b: Diagnosis) => {
     const points = (d: Diagnosis) => {
-      const selected = totalSymptoms(d).filter(
-        (s) => selectedIds.includes(s.symptom.id) && s.point > 0
-      );
-      if (selected.length === 0) return 0;
-      const selectedSum = selected.reduce((sum, s) => (sum += s.point), 0);
-      return selectedSum / 100;
+      const sum = pointSum(d);
+      return sum / 100;
     };
 
     const numberOfSymptoms = (d: Diagnosis) => {

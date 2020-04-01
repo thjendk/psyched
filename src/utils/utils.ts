@@ -28,7 +28,12 @@ const diagnosisIncludingSymptoms = (diagnosis: Diagnosis) => {
         (s) =>
           !diagnosis.symptoms.map((symp) => symp.symptom.id).includes(s.symptom.id) &&
           !diagnosis.parents
-            .flatMap((p) => diagnoses.find((d) => d.id === p.id).symptoms.map((s) => s.symptom.id))
+            .flatMap((p) =>
+              diagnoses
+                .find((d) => d.id === p.id)
+                .symptoms.filter((s) => !s.point || s.point > 0)
+                .map((s) => s.symptom.id)
+            )
             .includes(s.symptom.id)
       )
     );
@@ -67,4 +72,14 @@ export const colors = {
     color: 'white',
     description: 'Tilhører lignende diagnose, eller symptomgruppe valgt specifikt'
   }
+};
+
+export const pointSum = (d: Diagnosis) => {
+  const state = store.getState();
+  const selectedIds = state.symptoms.selectedIds;
+
+  const sum = d.symptoms
+    .filter((s) => selectedIds.includes(s.symptom.id))
+    .reduce((sum, s) => (sum += s?.point || 0), 0);
+  return sum;
 };
