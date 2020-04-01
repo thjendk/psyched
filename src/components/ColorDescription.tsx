@@ -17,8 +17,6 @@ const ColorDescription: React.SFC<ColorDescriptionProps> = () => {
     let r = [];
     for (let key in colors) {
       const item = colors[key];
-      console.log(item);
-
       r.push(
         <Popup
           position="top center"

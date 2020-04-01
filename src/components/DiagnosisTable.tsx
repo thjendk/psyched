@@ -21,23 +21,26 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
         d.icdCode.toLowerCase().includes(search.toLowerCase())
     )
   );
-  const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
+  const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
 
   const sorter = (a: Diagnosis, b: Diagnosis) => {
     const points = (d: Diagnosis) => {
       const selected = totalSymptoms(d).filter(
-        (s) => symptomIds.includes(s.symptom.id) && s.point > 0
+        (s) => selectedIds.includes(s.symptom.id) && s.point > 0
       );
       if (selected.length === 0) return 0;
       const selectedSum = selected.reduce((sum, s) => (sum += s.point), 0);
-      const totalSum = totalSymptoms(d).reduce((sum, s) => (sum += s.point), 0);
-      if (selectedSum === 0) return 0;
+      return selectedSum / 100;
+    };
 
-      return selectedSum / totalSum;
+    const numberOfSymptoms = (d: Diagnosis) => {
+      return totalSymptoms(d).filter((s) => selectedIds.includes(s.symptom.id)).length;
     };
 
     if (points(a) < points(b)) return 1;
     if (points(a) > points(b)) return -1;
+    if (numberOfSymptoms(a) < numberOfSymptoms(b)) return 1;
+    if (numberOfSymptoms(a) > numberOfSymptoms(b)) return -1;
     return a.icdCode.localeCompare(b.icdCode);
   };
 

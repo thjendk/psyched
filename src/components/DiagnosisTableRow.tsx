@@ -53,9 +53,6 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
   const symptoms = totalSymptoms(diagnosis).filter((s) => s.point > 0 || !s.point);
   const shownSymptoms = symptoms.filter((s) => s.symptom.parents.length === 0);
-  const pickedSymptoms = symptoms.filter(
-    (s) => selectedIds.includes(s.symptom.id) && (s.point > 0 || !s.point)
-  );
   const excessSymptoms = allSymptoms.filter(
     (symp) => !symptoms.map((s) => s.symptom.id).includes(symp.id) && selectedIds.includes(symp.id)
   );
@@ -107,12 +104,12 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
   const isAchieved = (d: Diagnosis) => {
     const diagnosis = diagnoses.find((diag) => diag.id === d.id);
     if (hasConflict(diagnosis)) return false;
-    const sum = keySymptoms(diagnosis).reduce((sum, s) => (sum += s.point), 0);
+    const sum = chosenSymptoms(diagnosis).reduce((sum, s) => (sum += s.point), 0);
     return sum >= 100;
   };
 
   const createAchieved = () => {
-    const sum = keySymptoms(diagnosis).reduce((sum, s) => (sum += s.point), 0);
+    const sum = chosenSymptoms(diagnosis).reduce((sum, s) => (sum += s?.point || 0), 0);
     if (hasConflict(diagnosis))
       return (
         <>
@@ -141,11 +138,11 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
       d.symptoms.filter((s) => selectedIds.includes(s.symptom.id)).some((s) => s.point < 0)
     )
       return true;
-    return keySymptoms(d).some((s) => s.point < 0);
+    return chosenSymptoms(d).some((s) => s.point < 0);
   };
 
-  const keySymptoms = (d: Diagnosis) => {
-    return d.symptoms.filter((s) => selectedIds.includes(s.symptom.id));
+  const chosenSymptoms = (d: Diagnosis) => {
+    return totalSymptoms(d).filter((s) => selectedIds.includes(s.symptom.id));
   };
 
   if (isEditing) return <DiagnosisInputRow diagnosis={diagnosis} setEditing={setEditing} />;
@@ -239,9 +236,11 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
         </Table.Cell>
         <Table.Cell textAlign="center">{createAchieved()}</Table.Cell>
         <Table.Cell>
-          {pickedSymptoms.length} / {symptoms.filter((s) => !s.point || s.point > 0).length} (
+          {chosenSymptoms(diagnosis).length} /{' '}
+          {symptoms.filter((s) => !s.point || s.point > 0).length} (
           {(
-            (pickedSymptoms.length / symptoms.filter((s) => !s.point || s.point > 0).length) *
+            (chosenSymptoms(diagnosis).length /
+              symptoms.filter((s) => !s.point || s.point > 0).length) *
             100
           ).toFixed(0)}{' '}
           %)
