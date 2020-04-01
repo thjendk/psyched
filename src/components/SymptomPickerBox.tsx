@@ -65,7 +65,6 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
                 {groupSymptoms
                   .slice()
                   .sort(sorter)
-                  .filter((s) => s.children.length === 0) // Parents vil indgå som overskrifter, hvor de kan vælges
                   .map((s) => (
                     <SymptomPickerRow symptom={s} search={search} />
                   ))}
