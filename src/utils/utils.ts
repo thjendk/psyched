@@ -14,7 +14,7 @@ const diagnosisParentSymptoms = (diagnosis: Diagnosis) => {
         (s) => !diagnosis.symptoms.map((symp) => symp.symptom.id).includes(s.symptom.id)
       )
     )
-    .map((ds) => ({ ...ds, point: 0 }));
+    .map((ds) => ({ ...ds, point: null }));
 };
 
 const diagnosisIncludingSymptoms = (diagnosis: Diagnosis) => {
