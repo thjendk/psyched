@@ -6,6 +6,7 @@ import { ReduxState } from 'redux/reducers';
 import LoadingPage from './misc/LoadingPage';
 import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
+export const DiagnosisContext = React.createContext<Diagnosis>(null);
 
 export interface DiagnosisTableProps {}
 
@@ -76,7 +77,11 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
           {diagnoses
             .slice()
             .sort(sorter)
-            .map((d) => <DiagnosisTableRow search={search} diagnosis={d} />)
+            .map((d) => (
+              <DiagnosisContext.Provider value={d}>
+                <DiagnosisTableRow search={search} />
+              </DiagnosisContext.Provider>
+            ))
             .concat(user && <DiagnosisInputRow />)}
         </Table.Body>
       </Table>

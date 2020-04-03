@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Table, Icon, Modal, Button } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
@@ -9,11 +9,11 @@ import DiagnosisInputRow from './DiagnosisInputRow';
 import DiagnosisParentInput from './DiagnosisParentInput';
 import SymptomTag from './SymptomTag';
 import Highlighter from 'react-highlighter';
-import { DiagnosisSymptom } from 'types/generated';
 import DiagnosisIncludingInput from './DiagnosisIncludingInput';
 import DiagnosisExcludingInput from './DiagnosisExcludingInput';
-import { getTopParents, addedSymptoms } from 'utils/utils';
-import _ from 'lodash';
+import { totalSymptoms } from 'utils/utils';
+import { DiagnosisContext } from './DiagnosisTable';
+import DiagnosisSymptomTags from './DiagnosisSymptomTags';
 
 const Break = styled.div`
   flex-basis: 100%;
@@ -31,7 +31,7 @@ export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
   margin-left: 5px;
   margin-top: 5px;
   cursor: pointer;
-  border: ${(props) => (props.active ? null : '1px dashed black')};
+  border: ${(props) => (props.active ? '1px solid white' : '1px dashed black')};
   white-space: nowrap;
 
   :hover {
@@ -40,39 +40,22 @@ export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
 `;
 
 export interface DiagnosisTableRowProps {
-  diagnosis: Diagnosis;
   search: String;
 }
 
-const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, search }) => {
+const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search }) => {
   const [adding, setAdding] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setEditing] = useState(false);
-  const user = useSelector((state: ReduxState) => state.auth.user);
+  const diagnosis = useContext(DiagnosisContext);
   const allSymptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
+  const user = useSelector((state: ReduxState) => state.auth.user);
   const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
   const symptoms = diagnosis.symptoms.filter(
     (s) => (s.point > 0 || !s.point) && s.symptom.parents.length === 0
   );
-  const parents = getTopParents(diagnosis);
-  const added = addedSymptoms(diagnosis);
-  const excessSymptoms = allSymptoms.filter(
-    (symp) =>
-      !_.unionBy(
-        symptoms.map((s) => s.symptom),
-        parents,
-        added,
-        (s) => s.id
-      )
-        .map((s) => s.id)
-        .includes(symp.id) && selectedIds.includes(symp.id)
-  );
-
-  const sorter = (a: DiagnosisSymptom, b: DiagnosisSymptom) => {
-    return a.symptom.name.localeCompare(b.symptom.name);
-  };
 
   const handleRemove = async () => {
     setIsDeleting(true);
@@ -94,13 +77,23 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
   };
 
   const createExcess = () => {
-    const excess = excessSymptoms.map((s) => {
-      const exists = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
-      return <SymptomTag excess diagnosis={diagnosis} symptom={s} diagnosisSymptom={exists} />;
+    const excessSymptoms = allSymptoms.filter((s) => {
+      return (
+        selectedIds.includes(s.id) &&
+        (!totalSymptoms(diagnosis).includes(s.id) ||
+          diagnosis.symptoms.find((symp) => symp.symptom.id === s.id)?.point < 0)
+      );
     });
 
-    if (excess.length === 0)
+    if (excessSymptoms.length === 0) {
       return <Icon style={{ marginLeft: '5px', alignSelf: 'center' }} name="check" color="green" />;
+    }
+
+    const excess = excessSymptoms.map((s) => {
+      const exists = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
+      return <SymptomTag excess symptom={s} diagnosisSymptom={exists} />;
+    });
+
     return excess;
   };
 
@@ -260,32 +253,16 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
       <Table.Row>
         <Table.Cell style={{ border: '1px solid #e3e3e3' }} colSpan={8}>
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-            {symptoms
-              .slice()
-              .sort(sorter)
-              .map((s: DiagnosisSymptom) => (
-                <SymptomTag diagnosisSymptom={s} diagnosis={diagnosis} />
-              ))
-              .concat(
-                ..._.unionBy(parents, added, 'id').map((p) => (
-                  <SymptomTag symptom={p} diagnosis={diagnosis} key={p.id} />
-                ))
-              )
-              .concat(
-                user &&
-                  (adding ? (
-                    <DiagnosisSymptomInput diagnosis={diagnosis} setAdding={setAdding} />
-                  ) : (
-                    <Tag onClick={() => setAdding(true)}>+ Tilføj symptom</Tag>
-                  ))
-              )
-              .concat(
-                <>
-                  <Break />
-                  <span style={{ alignSelf: 'center' }}>Ikke matchende symptomer: </span>
-                  {createExcess()}
-                </>
-              )}
+            <DiagnosisSymptomTags />
+            {user &&
+              (adding ? (
+                <DiagnosisSymptomInput diagnosis={diagnosis} setAdding={setAdding} />
+              ) : (
+                <Tag onClick={() => setAdding(true)}>+ Tilføj symptom</Tag>
+              ))}
+            <Break />
+            <span style={{ alignSelf: 'center' }}>Ikke matchende symptomer: </span>
+            {createExcess()}
           </div>
         </Table.Cell>
       </Table.Row>

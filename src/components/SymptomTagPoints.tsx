@@ -7,15 +7,10 @@ import Diagnosis from 'classes/Diagnosis.class';
 
 export interface SymptomTagPointsProps {
   symptom: DiagnosisSymptom;
-  isNotParent: boolean;
   diagnosis: Diagnosis;
 }
 
-const SymptomTagPoints: React.SFC<SymptomTagPointsProps> = ({
-  symptom,
-  isNotParent,
-  diagnosis
-}) => {
+const SymptomTagPoints: React.SFC<SymptomTagPointsProps> = ({ symptom, diagnosis }) => {
   const user = useSelector((state: ReduxState) => state.auth.user);
   const ref = useRef(null);
   const [editing, setEditing] = useState(false);
@@ -33,6 +28,7 @@ const SymptomTagPoints: React.SFC<SymptomTagPointsProps> = ({
     ref.current?.focus();
   }, [editing]);
 
+  if (!symptom) return null;
   if (editing)
     return (
       <Form onSubmit={handleSubmit}>
@@ -47,14 +43,13 @@ const SymptomTagPoints: React.SFC<SymptomTagPointsProps> = ({
         />
       </Form>
     );
-  if (point && isNotParent)
+  if (point)
     return (
       <span onClick={() => setEditing(true)} style={{ marginLeft: '5px' }}>
         {point}
       </span>
     );
-  if (!point && user && isNotParent)
-    return <Icon onClick={() => setEditing(true)} name="wrench" color="grey" />;
+  if (!point && user) return <Icon onClick={() => setEditing(true)} name="wrench" color="grey" />;
   return null;
 };
 

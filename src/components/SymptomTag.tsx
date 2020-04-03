@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Symptom from 'classes/Symptom.class';
 import { Popup, Modal, Icon, Button } from 'semantic-ui-react';
 import { Tag } from './DiagnosisTableRow';
@@ -7,29 +7,24 @@ import { ReduxState } from 'redux/reducers';
 import Diagnosis from 'classes/Diagnosis.class';
 import SymptomTagPoints from './SymptomTagPoints';
 import { DiagnosisSymptom } from 'types/generated';
+import { DiagnosisContext } from './DiagnosisTable';
 
 export interface SymptomTagProps {
   symptom?: Symptom;
   diagnosisSymptom?: DiagnosisSymptom;
-  diagnosis: Diagnosis;
   style?: any;
   excess?: boolean;
 }
 
-const SymptomTag: React.SFC<SymptomTagProps> = ({
-  symptom,
-  diagnosis,
-  style,
-  diagnosisSymptom,
-  excess
-}) => {
+const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom, style, diagnosisSymptom, excess }) => {
+  const belongs = !!diagnosisSymptom;
+  const diagnosis = useContext(DiagnosisContext);
   const s = symptom || diagnosisSymptom.symptom;
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const user = useSelector((state: ReduxState) => state.auth.user);
   const symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
   const [modalOpen, setModalOpen] = useState(false);
   const [removeLoading, setRemoveLoading] = useState(false);
-  const isNotParent = diagnosis.symptoms.map((s) => s.symptom.id).includes(s.id);
 
   const handlePick = (id: number) => {
     Symptom.pick(id);
@@ -42,21 +37,19 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
     setRemoveLoading(false);
   };
 
-  if (excess && diagnosisSymptom?.point < 0)
+  if (excess) {
+    if (diagnosisSymptom?.point < 0)
+      return (
+        <SymptomTag
+          diagnosisSymptom={diagnosisSymptom}
+          style={{
+            backgroundColor: 'red',
+            color: 'white'
+          }}
+        />
+      );
     return (
       <SymptomTag
-        diagnosis={diagnosis}
-        diagnosisSymptom={diagnosisSymptom}
-        style={{
-          backgroundColor: 'red',
-          color: 'white'
-        }}
-      />
-    );
-  if (excess)
-    return (
-      <SymptomTag
-        diagnosis={diagnosis}
         symptom={s}
         style={{
           backgroundColor: '#870000',
@@ -64,16 +57,16 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
         }}
       />
     );
-  if (diagnosisSymptom?.point < 0) return null;
+  }
   return (
     <Popup
       key={s.id}
       position="top center"
       disabled={!s.description}
       trigger={
-        <Tag style={style} active={symptomIds.includes(s.id)} notParent={isNotParent}>
+        <Tag notParent={belongs} style={style} active={symptomIds.includes(s.id)}>
           <span onClick={() => handlePick(s.id)}>{s.name.toTitleCase()}</span>
-          {user && isNotParent && (
+          {user && belongs && diagnosisSymptom?.point < 0 && (
             <Modal
               open={modalOpen}
               trigger={
@@ -104,11 +97,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
               </Modal.Actions>
             </Modal>
           )}
-          <SymptomTagPoints
-            diagnosis={diagnosis}
-            symptom={diagnosisSymptom}
-            isNotParent={isNotParent}
-          />
+          <SymptomTagPoints diagnosis={diagnosis} symptom={diagnosisSymptom} />
           <div
             style={{
               display: 'flex',
@@ -119,14 +108,11 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
           >
             {s.children.map((s) => {
               const chosenChild = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
-              if (!!chosenChild)
-                return <SymptomTag diagnosisSymptom={chosenChild} diagnosis={diagnosis} />;
-              if (isNotParent) {
-                const symptom = symptoms.find((symp) => symp.id === s.id);
-                return <SymptomTag symptom={symptom} diagnosis={diagnosis} />;
-              }
-              if (!chosenChild || chosenChild.point < 0) return null;
-              return null;
+              if (!!chosenChild) return <SymptomTag diagnosisSymptom={chosenChild} />;
+              if (chosenChild?.point < 0) return null;
+              if (!diagnosisSymptom) return null;
+              const symptom = symptoms.find((symp) => symp.id === s.id);
+              return <SymptomTag symptom={symptom} />;
             })}
           </div>
         </Tag>
