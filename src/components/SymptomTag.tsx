@@ -13,13 +13,15 @@ export interface SymptomTagProps {
   diagnosisSymptom?: DiagnosisSymptom;
   diagnosis: Diagnosis;
   style?: any;
+  excess?: boolean;
 }
 
 const SymptomTag: React.SFC<SymptomTagProps> = ({
   symptom,
   diagnosis,
   style,
-  diagnosisSymptom
+  diagnosisSymptom,
+  excess
 }) => {
   const s = symptom || diagnosisSymptom.symptom;
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
@@ -40,6 +42,29 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
     setRemoveLoading(false);
   };
 
+  if (excess && diagnosisSymptom?.point < 0)
+    return (
+      <SymptomTag
+        diagnosis={diagnosis}
+        diagnosisSymptom={diagnosisSymptom}
+        style={{
+          backgroundColor: 'red',
+          color: 'white'
+        }}
+      />
+    );
+  if (excess)
+    return (
+      <SymptomTag
+        diagnosis={diagnosis}
+        symptom={s}
+        style={{
+          backgroundColor: '#870000',
+          color: 'white'
+        }}
+      />
+    );
+  if (diagnosisSymptom?.point < 0) return null;
   return (
     <Popup
       key={s.id}
@@ -84,7 +109,14 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
             symptom={diagnosisSymptom}
             isNotParent={isNotParent}
           />
-          <div style={{ display: 'flex', justifyContent: 'space-apart', flexWrap: 'wrap' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-apart',
+              flexWrap: 'wrap',
+              alignItems: 'flex-start'
+            }}
+          >
             {s.children.map((s) => {
               const chosenChild = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
               if (!!chosenChild)

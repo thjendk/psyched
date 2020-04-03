@@ -6,7 +6,6 @@ import { ReduxState } from 'redux/reducers';
 import LoadingPage from './misc/LoadingPage';
 import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
-import { totalSymptoms, pointSum } from 'utils/utils';
 
 export interface DiagnosisTableProps {}
 
@@ -25,12 +24,14 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
 
   const sorter = (a: Diagnosis, b: Diagnosis) => {
     const points = (d: Diagnosis) => {
-      const sum = pointSum(d);
+      const sum = d.symptoms
+        .filter((s) => selectedIds.includes(s.symptom.id))
+        .reduce((sum, s) => (sum += s?.point || 0), 0);
       return sum / 100;
     };
 
     const numberOfSymptoms = (d: Diagnosis) => {
-      return totalSymptoms(d).filter((s) => selectedIds.includes(s.symptom.id)).length;
+      return d.symptoms.filter((s) => selectedIds.includes(s.symptom.id)).length;
     };
 
     if (points(a) < points(b)) return 1;
@@ -50,7 +51,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
       <Table celled size="small">
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell colSpan={user ? 10 : 9}>
+            <Table.HeaderCell colSpan={user ? 9 : 8}>
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -60,16 +61,15 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
             </Table.HeaderCell>
           </Table.Row>
           <Table.Row>
-            <Table.HeaderCell>Diagnose</Table.HeaderCell>
+            <Table.HeaderCell width={1}>Diagnose</Table.HeaderCell>
             <Table.HeaderCell style={{ width: '70px' }}>ICD-10</Table.HeaderCell>
             <Table.HeaderCell width={4}>Beskrivelse</Table.HeaderCell>
             <Table.HeaderCell style={{ width: '130px' }}>Krævet</Table.HeaderCell>
             <Table.HeaderCell style={{ width: '130px' }}>Udelukkende</Table.HeaderCell>
             <Table.HeaderCell style={{ width: '130px' }}>Lignende</Table.HeaderCell>
-            <Table.HeaderCell>Symptomer</Table.HeaderCell>
-            <Table.HeaderCell>Opfyldt</Table.HeaderCell>
-            <Table.HeaderCell>Antal</Table.HeaderCell>
-            {user && <Table.HeaderCell>Muligheder</Table.HeaderCell>}
+            <Table.HeaderCell width={1}>Opfyldt</Table.HeaderCell>
+            <Table.HeaderCell width={1}>Antal</Table.HeaderCell>
+            {user && <Table.HeaderCell width={1}>Muligheder</Table.HeaderCell>}
           </Table.Row>
         </Table.Header>
         <Table.Body>

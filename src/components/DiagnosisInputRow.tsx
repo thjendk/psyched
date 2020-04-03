@@ -68,7 +68,6 @@ const DiagnosisInputRow: React.SFC<DiagnosisInputRowProps> = ({ diagnosis, setEd
       <Table.Cell />
       <Table.Cell />
       <Table.Cell />
-      <Table.Cell />
       <Table.Cell>
         <Button
           loading={isAdding}

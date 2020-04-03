@@ -1,63 +1,7 @@
-import Diagnosis from 'classes/Diagnosis.class';
 import { store } from 'index';
-import { DiagnosisSymptom } from 'types/generated';
+import Symptom from 'classes/Symptom.class';
+import Diagnosis from 'classes/Diagnosis.class';
 import _ from 'lodash';
-
-const diagnosisParentSymptoms = (diagnosis: Diagnosis) => {
-  const state = store.getState();
-  const diagnoses = state.diagnoses.diagnoses;
-
-  return diagnosis.parents
-    .map((p) => diagnoses.find((d) => d.id === p.id))
-    .flatMap((d) =>
-      d.symptoms.filter(
-        (s) => !diagnosis.symptoms.map((symp) => symp.symptom.id).includes(s.symptom.id)
-      )
-    )
-    .map((ds) => ({ ...ds, point: 0 }));
-};
-
-const diagnosisIncludingSymptoms = (diagnosis: Diagnosis) => {
-  const state = store.getState();
-  const diagnoses = state.diagnoses.diagnoses;
-
-  return diagnosis.including
-    .map((p) => diagnoses.find((d) => d.id === p.id))
-    .flatMap((d) =>
-      d.symptoms.filter(
-        (s) =>
-          !diagnosis.symptoms.map((symp) => symp.symptom.id).includes(s.symptom.id) &&
-          !diagnosis.parents
-            .flatMap((p) =>
-              diagnoses
-                .find((d) => d.id === p.id)
-                .symptoms.filter((s) => !s.point || s.point > 0)
-                .map((s) => s.symptom.id)
-            )
-            .includes(s.symptom.id)
-      )
-    );
-};
-
-const diagnosisSymptomParents = (diagnosis: Diagnosis, diagnosisSymptoms: DiagnosisSymptom[]) => {
-  const state = store.getState();
-  const symptoms = state.symptoms.symptoms;
-  let parentIds = diagnosis.symptoms.flatMap((s) =>
-    s.symptom.parents
-      .map((p) => p.id)
-      .filter((id) => !diagnosisSymptoms.map((s) => s.symptom.id).includes(id))
-  );
-  parentIds = _.uniq(parentIds);
-  return parentIds.map((id) => ({ symptom: symptoms.find((s) => s.id === id) }));
-};
-
-export const totalSymptoms = (diagnosis: Diagnosis) => {
-  let symptoms = diagnosis.symptoms
-    .concat(diagnosisParentSymptoms(diagnosis))
-    .concat(diagnosisIncludingSymptoms(diagnosis));
-  symptoms = symptoms.concat(diagnosisSymptomParents(diagnosis, symptoms));
-  return symptoms;
-};
 
 export const colors = {
   notParent: {
@@ -74,12 +18,41 @@ export const colors = {
   }
 };
 
-export const pointSum = (d: Diagnosis) => {
+const getParent = (s: Symptom): Symptom => {
   const state = store.getState();
-  const selectedIds = state.symptoms.selectedIds;
+  const symptoms = state.symptoms.symptoms;
+  s = symptoms.find((symp) => symp.id === s.id);
 
-  const sum = d.symptoms
-    .filter((s) => selectedIds.includes(s.symptom.id))
-    .reduce((sum, s) => (sum += s?.point || 0), 0);
-  return sum;
+  if (s.parents.length === 0) return;
+  return getParent(s.parents[0]);
+};
+
+export const getTopParents = (d: Diagnosis): Symptom[] => {
+  const symptoms = d.symptoms.filter((s) => s.symptom.parents.length > 0);
+  if (symptoms.length === 0) return [];
+  let parents: Symptom[] = [];
+  for (let s of symptoms) {
+    const parent = getParent(s.symptom);
+    if (!parent) continue;
+    parents.push(parent);
+  }
+
+  return _.uniqBy(parents, (p) => p.id);
+};
+
+export const addedSymptoms = (d: Diagnosis) => {
+  const state = store.getState();
+  const diagnoses = state.diagnoses.diagnoses;
+
+  let symptoms: Symptom[] = [];
+  for (let diag of d.including) {
+    diag = diagnoses.find((d) => d.id === diag.id);
+    symptoms.concat(getTopParents(diag));
+  }
+  for (let diag of d.parents) {
+    diag = diagnoses.find((d) => d.id === diag.id);
+    symptoms.concat(getTopParents(diag));
+  }
+
+  return _.uniqBy(symptoms, (s) => s.id);
 };

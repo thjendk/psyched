@@ -8,11 +8,12 @@ import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
 import DiagnosisParentInput from './DiagnosisParentInput';
 import SymptomTag from './SymptomTag';
-import { totalSymptoms, pointSum } from 'utils/utils';
 import Highlighter from 'react-highlighter';
 import { DiagnosisSymptom } from 'types/generated';
 import DiagnosisIncludingInput from './DiagnosisIncludingInput';
 import DiagnosisExcludingInput from './DiagnosisExcludingInput';
+import { getTopParents, addedSymptoms } from 'utils/utils';
+import _ from 'lodash';
 
 const Break = styled.div`
   flex-basis: 100%;
@@ -52,10 +53,21 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
   const allSymptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
   const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
-  const symptoms = totalSymptoms(diagnosis).filter((s) => s.point > 0 || !s.point);
-  const shownSymptoms = symptoms.filter((s) => s.symptom.parents.length === 0);
+  const symptoms = diagnosis.symptoms.filter(
+    (s) => (s.point > 0 || !s.point) && s.symptom.parents.length === 0
+  );
+  const parents = getTopParents(diagnosis);
+  const added = addedSymptoms(diagnosis);
   const excessSymptoms = allSymptoms.filter(
-    (symp) => !symptoms.map((s) => s.symptom.id).includes(symp.id) && selectedIds.includes(symp.id)
+    (symp) =>
+      !_.unionBy(
+        symptoms.map((s) => s.symptom),
+        parents,
+        added,
+        (s) => s.id
+      )
+        .map((s) => s.id)
+        .includes(symp.id) && selectedIds.includes(symp.id)
   );
 
   const sorter = (a: DiagnosisSymptom, b: DiagnosisSymptom) => {
@@ -84,17 +96,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
   const createExcess = () => {
     const excess = excessSymptoms.map((s) => {
       const exists = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
-      return (
-        <SymptomTag
-          diagnosis={diagnosis}
-          symptom={s}
-          diagnosisSymptom={exists}
-          style={{
-            backgroundColor: exists?.point < 0 ? 'red' : '#870000',
-            color: 'white'
-          }}
-        />
-      );
+      return <SymptomTag excess diagnosis={diagnosis} symptom={s} diagnosisSymptom={exists} />;
     });
 
     if (excess.length === 0)
@@ -105,12 +107,14 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
   const isAchieved = (d: Diagnosis) => {
     const diagnosis = diagnoses.find((diag) => diag.id === d.id);
     if (hasConflict(diagnosis)) return false;
-    const sum = chosenSymptoms(diagnosis).reduce((sum, s) => (sum += s.point), 0);
+    const sum = chosenSymptoms(diagnosis).reduce((sum, s) => (sum += s?.point || 0), 0);
     return sum >= 100;
   };
 
   const createAchieved = () => {
-    const sum = pointSum(diagnosis);
+    const sum = diagnosis.symptoms
+      .filter((s) => selectedIds.includes(s.symptom.id))
+      .reduce((sum, s) => (sum += s?.point || 0), 0);
     if (hasConflict(diagnosis))
       return (
         <>
@@ -143,14 +147,14 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
   };
 
   const chosenSymptoms = (d: Diagnosis) => {
-    return totalSymptoms(d).filter((s) => selectedIds.includes(s.symptom.id));
+    return d.symptoms.filter((s) => selectedIds.includes(s.symptom.id));
   };
 
   if (isEditing) return <DiagnosisInputRow diagnosis={diagnosis} setEditing={setEditing} />;
   return (
     <>
       <Table.Row>
-        <Table.Cell>
+        <Table.Cell rowSpan={2}>
           <Highlighter search={search}>{diagnosis.name}</Highlighter>
         </Table.Cell>
         <Table.Cell textAlign="center">
@@ -201,38 +205,12 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
                   {diagnoses.find((d) => d.id === p.id).name}
                   {user && (
                     <>
-                      {' '}
                       <Icon onClick={() => handleRemoveParent(p.id)} name="close" color="grey" />
                     </>
                   )}
                 </Tag>
               ))
               .concat(user && <DiagnosisParentInput diagnosis={diagnosis} />)}
-          </div>
-        </Table.Cell>
-        <Table.Cell>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-            {shownSymptoms
-              .slice()
-              .sort(sorter)
-              .map((s: DiagnosisSymptom) => (
-                <SymptomTag diagnosisSymptom={s} diagnosis={diagnosis} />
-              ))
-              .concat(
-                user &&
-                  (adding ? (
-                    <DiagnosisSymptomInput diagnosis={diagnosis} setAdding={setAdding} />
-                  ) : (
-                    <Tag onClick={() => setAdding(true)}>+ Tilføj symptom</Tag>
-                  ))
-              )
-              .concat(
-                <>
-                  <Break />
-                  <span style={{ alignSelf: 'center' }}>Ikke matchende symptomer: </span>
-                  {createExcess()}
-                </>
-              )}
           </div>
         </Table.Cell>
         <Table.Cell textAlign="center">{createAchieved()}</Table.Cell>
@@ -278,6 +256,38 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ diagnosis, searc
             </Button.Group>
           </Table.Cell>
         )}
+      </Table.Row>
+      <Table.Row>
+        <Table.Cell style={{ border: '1px solid #e3e3e3' }} colSpan={8}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+            {symptoms
+              .slice()
+              .sort(sorter)
+              .map((s: DiagnosisSymptom) => (
+                <SymptomTag diagnosisSymptom={s} diagnosis={diagnosis} />
+              ))
+              .concat(
+                ..._.unionBy(parents, added, 'id').map((p) => (
+                  <SymptomTag symptom={p} diagnosis={diagnosis} key={p.id} />
+                ))
+              )
+              .concat(
+                user &&
+                  (adding ? (
+                    <DiagnosisSymptomInput diagnosis={diagnosis} setAdding={setAdding} />
+                  ) : (
+                    <Tag onClick={() => setAdding(true)}>+ Tilføj symptom</Tag>
+                  ))
+              )
+              .concat(
+                <>
+                  <Break />
+                  <span style={{ alignSelf: 'center' }}>Ikke matchende symptomer: </span>
+                  {createExcess()}
+                </>
+              )}
+          </div>
+        </Table.Cell>
       </Table.Row>
     </>
   );
