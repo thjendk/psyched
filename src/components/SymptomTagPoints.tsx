@@ -49,7 +49,15 @@ const SymptomTagPoints: React.SFC<SymptomTagPointsProps> = ({ symptom, diagnosis
         {point}
       </span>
     );
-  if (!point && user) return <Icon onClick={() => setEditing(true)} name="wrench" color="grey" />;
+  if (!point && user)
+    return (
+      <Icon
+        style={{ marginLeft: '5px' }}
+        onClick={() => setEditing(true)}
+        name="wrench"
+        color="grey"
+      />
+    );
   return null;
 };
 
