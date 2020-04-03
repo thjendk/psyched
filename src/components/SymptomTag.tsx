@@ -66,7 +66,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom, style, diagnosisSympt
       trigger={
         <Tag notParent={belongs} style={style} active={symptomIds.includes(s.id)}>
           <span onClick={() => handlePick(s.id)}>{s.name.toTitleCase()}</span>
-          {user && belongs && diagnosisSymptom?.point < 0 && (
+          {user && belongs && (
             <Modal
               open={modalOpen}
               trigger={
