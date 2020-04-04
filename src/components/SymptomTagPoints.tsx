@@ -43,12 +43,7 @@ const SymptomTagPoints: React.SFC<SymptomTagPointsProps> = ({ symptom, diagnosis
         />
       </Form>
     );
-  if (point)
-    return (
-      <span onClick={() => setEditing(true)} style={{ marginLeft: '5px' }}>
-        {point}
-      </span>
-    );
+  if (point) return <span onClick={() => setEditing(true)}>{point}</span>;
   if (!point && user) return <Icon onClick={() => setEditing(true)} name="wrench" color="grey" />;
   return null;
 };
