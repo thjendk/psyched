@@ -2,6 +2,7 @@ import React from 'react';
 import { colors } from 'utils/utils';
 import styled from 'styled-components';
 import { Popup } from 'semantic-ui-react';
+import HideToggle from './HideToggle';
 
 const ColorBox = styled.div`
   height: 15px;
@@ -30,7 +31,16 @@ const ColorDescription: React.SFC<ColorDescriptionProps> = () => {
   };
 
   return (
-    <div style={{ display: 'flex', margin: '1rem auto', justifyContent: 'center' }}>{create()}</div>
+    <div
+      style={{
+        display: 'flex',
+        margin: '1rem auto',
+        justifyContent: 'center',
+        alignItems: 'middle'
+      }}
+    >
+      {create()} <HideToggle />
+    </div>
   );
 };
 

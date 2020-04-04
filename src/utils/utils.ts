@@ -38,7 +38,7 @@ export const parentIds = (diagnosis: Diagnosis): number[] => {
   return _.uniqBy(parents, (p) => p.id).map((s) => s.id);
 };
 
-const parentsAndChildren = (diagnosis: Diagnosis) => {
+const parentsAndChildren = (diagnosis: Diagnosis): number[] => {
   const filtered = diagnosis.symptoms
     .filter((s) => s.symptom.parents.length === 0)
     .map((s) => s.symptom.id);
@@ -46,7 +46,7 @@ const parentsAndChildren = (diagnosis: Diagnosis) => {
   return _.union(filtered, parents);
 };
 
-export const totalSymptoms = (diagnosis: Diagnosis) => {
+export const totalSymptoms = (diagnosis: Diagnosis): number[] => {
   const state = store.getState();
   const diagnoses = state.diagnoses.diagnoses;
 
@@ -63,20 +63,19 @@ export const totalSymptoms = (diagnosis: Diagnosis) => {
   return _.union(symptoms, parentSymptomIds, includedIds, similarIds);
 };
 
-export const addedSymptoms = (diagnosis: Diagnosis) => {
+export const addedSymptoms = (diagnosis: Diagnosis): number[] => {
   const state = store.getState();
   const diagnoses = state.diagnoses.diagnoses;
-  const allSymptoms = state.symptoms.symptoms;
 
-  let symptoms: Symptom[] = [];
+  let symptomIds: number[] = [];
   for (let d of diagnosis.including) {
     d = diagnoses.find((diag) => diag.id === d.id);
-    symptoms.concat(parentIds(d).map((id) => allSymptoms.find((s) => s.id === id)));
+    symptomIds.push(...totalSymptoms(d));
   }
   for (let d of diagnosis.parents) {
     d = diagnoses.find((diag) => diag.id === d.id);
-    symptoms.concat(parentIds(d).map((id) => allSymptoms.find((s) => s.id === id)));
+    symptomIds.push(...totalSymptoms(d));
   }
 
-  return _.uniqBy(symptoms, (s) => s.id);
+  return _.uniq(symptomIds);
 };

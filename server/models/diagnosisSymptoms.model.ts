@@ -5,6 +5,7 @@ interface DiagnosisSymptoms {
   diagnosisId: number;
   userId: number;
   point: number;
+  hidden: 1 | 0;
 }
 
 class DiagnosisSymptoms extends Model {

@@ -38,8 +38,9 @@ export type DiagnosisInput = {
 
 export type DiagnosisSymptom = {
    __typename?: 'DiagnosisSymptom';
-  point?: Maybe<Scalars['Int']>;
   symptom?: Maybe<Symptom>;
+  point?: Maybe<Scalars['Int']>;
+  hidden?: Maybe<Scalars['Boolean']>;
 };
 
 export type Mutation = {
@@ -56,6 +57,7 @@ export type Mutation = {
   addSymptomToDiagnosis?: Maybe<Diagnosis>;
   updateDiagnosisSymptom?: Maybe<Diagnosis>;
   removeSymptomFromDiagnosis?: Maybe<Diagnosis>;
+  toggleHideDiagnosisSymptom?: Maybe<Diagnosis>;
   addExcludingDiagnosisToDiagnosis?: Maybe<Diagnosis>;
   removeExcludingDiagnosisFromDiagnosis?: Maybe<Diagnosis>;
   addIncludingDiagnosisToDiagnosis?: Maybe<Diagnosis>;
@@ -120,6 +122,12 @@ export type MutationUpdateDiagnosisSymptomArgs = {
 
 
 export type MutationRemoveSymptomFromDiagnosisArgs = {
+  diagnosisId?: Maybe<Scalars['Int']>;
+  symptomId?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationToggleHideDiagnosisSymptomArgs = {
   diagnosisId?: Maybe<Scalars['Int']>;
   symptomId?: Maybe<Scalars['Int']>;
 };
@@ -293,11 +301,11 @@ export type ResolversTypes = ResolversObject<{
   Diagnosis: ResolverTypeWrapper<Partial<Diagnosis>>,
   DiagnosisSymptom: ResolverTypeWrapper<Partial<DiagnosisSymptom>>,
   Symptom: ResolverTypeWrapper<Partial<Symptom>>,
+  Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']>>,
   Mutation: ResolverTypeWrapper<{}>,
   UserInput: ResolverTypeWrapper<Partial<UserInput>>,
   DiagnosisInput: ResolverTypeWrapper<Partial<DiagnosisInput>>,
   SymptomInput: ResolverTypeWrapper<Partial<SymptomInput>>,
-  Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']>>,
   CacheControlScope: ResolverTypeWrapper<Partial<CacheControlScope>>,
   Upload: ResolverTypeWrapper<Partial<Scalars['Upload']>>,
 }>;
@@ -311,11 +319,11 @@ export type ResolversParentTypes = ResolversObject<{
   Diagnosis: Partial<Diagnosis>,
   DiagnosisSymptom: Partial<DiagnosisSymptom>,
   Symptom: Partial<Symptom>,
+  Boolean: Partial<Scalars['Boolean']>,
   Mutation: {},
   UserInput: Partial<UserInput>,
   DiagnosisInput: Partial<DiagnosisInput>,
   SymptomInput: Partial<SymptomInput>,
-  Boolean: Partial<Scalars['Boolean']>,
   CacheControlScope: Partial<CacheControlScope>,
   Upload: Partial<Scalars['Upload']>,
 }>;
@@ -334,8 +342,9 @@ export type DiagnosisResolvers<ContextType = Context, ParentType extends Resolve
 }>;
 
 export type DiagnosisSymptomResolvers<ContextType = Context, ParentType extends ResolversParentTypes['DiagnosisSymptom'] = ResolversParentTypes['DiagnosisSymptom']> = ResolversObject<{
-  point?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   symptom?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType>,
+  point?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  hidden?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
 
@@ -352,6 +361,7 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   addSymptomToDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationAddSymptomToDiagnosisArgs, never>>,
   updateDiagnosisSymptom?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationUpdateDiagnosisSymptomArgs, never>>,
   removeSymptomFromDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationRemoveSymptomFromDiagnosisArgs, never>>,
+  toggleHideDiagnosisSymptom?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationToggleHideDiagnosisSymptomArgs, never>>,
   addExcludingDiagnosisToDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationAddExcludingDiagnosisToDiagnosisArgs, never>>,
   removeExcludingDiagnosisFromDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationRemoveExcludingDiagnosisFromDiagnosisArgs, never>>,
   addIncludingDiagnosisToDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationAddIncludingDiagnosisToDiagnosisArgs, never>>,

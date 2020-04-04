@@ -20,6 +20,7 @@ export const typeDefs = gql`
     addSymptomToDiagnosis(diagnosisId: Int, symptomId: Int): Diagnosis
     updateDiagnosisSymptom(diagnosisId: Int, symptomId: Int, point: Int): Diagnosis
     removeSymptomFromDiagnosis(diagnosisId: Int, symptomId: Int): Diagnosis
+    toggleHideDiagnosisSymptom(diagnosisId: Int, symptomId: Int): Diagnosis
     addExcludingDiagnosisToDiagnosis(diagnosisId: Int, excludingId: Int): Diagnosis
     removeExcludingDiagnosisFromDiagnosis(diagnosisId: Int, excludingId: Int): Diagnosis
     addIncludingDiagnosisToDiagnosis(diagnosisId: Int, includingId: Int): Diagnosis
@@ -45,8 +46,9 @@ export const typeDefs = gql`
   }
 
   type DiagnosisSymptom {
-    point: Int
     symptom: Symptom
+    point: Int
+    hidden: Boolean
   }
 `;
 
@@ -81,15 +83,20 @@ export const resolvers: Resolvers = {
       return { id: diagnosisId };
     },
     updateDiagnosisSymptom: async (root, { diagnosisId, symptomId, point }) => {
-      await DiagnosisSymptoms.query()
-        .where({ diagnosisId, symptomId })
-        .update({ point });
+      await DiagnosisSymptoms.query().where({ diagnosisId, symptomId }).update({ point });
       return { id: diagnosisId };
     },
     removeSymptomFromDiagnosis: async (root, { symptomId, diagnosisId }) => {
-      await DiagnosisSymptoms.query()
-        .where({ symptomId, diagnosisId })
-        .delete();
+      await DiagnosisSymptoms.query().where({ symptomId, diagnosisId }).delete();
+      return { id: diagnosisId };
+    },
+    toggleHideDiagnosisSymptom: async (root, { diagnosisId, symptomId }) => {
+      const join = await DiagnosisSymptoms.query().findOne({ symptomId, diagnosisId });
+      if (!join) {
+        await DiagnosisSymptoms.query().insert({ diagnosisId, symptomId, hidden: 1 });
+      } else {
+        await join.$query().update({ hidden: join.hidden ? 0 : 1 });
+      }
       return { id: diagnosisId };
     },
     addDiagnosisParent: async (root, { id, parentId }, ctx) => {
@@ -107,9 +114,7 @@ export const resolvers: Resolvers = {
       return { id: diagnosisId };
     },
     removeExcludingDiagnosisFromDiagnosis: async (root, { diagnosisId, excludingId }) => {
-      await DiagnosisExcluding.query()
-        .where({ diagnosisId, excludingId })
-        .delete();
+      await DiagnosisExcluding.query().where({ diagnosisId, excludingId }).delete();
       return { id: diagnosisId };
     },
     addIncludingDiagnosisToDiagnosis: async (root, { diagnosisId, includingId }) => {
@@ -117,9 +122,7 @@ export const resolvers: Resolvers = {
       return { id: diagnosisId };
     },
     removeIncludingDiagnosisFromDiagnosis: async (root, { diagnosisId, includingId }) => {
-      await DiagnosisIncluding.query()
-        .where({ diagnosisId, includingId })
-        .delete();
+      await DiagnosisIncluding.query().where({ diagnosisId, includingId }).delete();
       return { id: diagnosisId };
     }
   },
@@ -140,7 +143,11 @@ export const resolvers: Resolvers = {
     },
     symptoms: async ({ id }) => {
       const joins = await DiagnosisSymptoms.query().where({ diagnosisId: id });
-      return joins.map((j) => ({ symptom: { id: j.symptomId }, point: j.point }));
+      return joins.map((j) => ({
+        symptom: { id: j.symptomId },
+        point: j.point,
+        hidden: !!j.hidden
+      }));
     },
     parents: async ({ id }) => {
       const parents = await DiagnosisParent.query().where({ diagnosisId: id });

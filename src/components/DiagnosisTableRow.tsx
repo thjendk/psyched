@@ -48,13 +48,13 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search }) => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setEditing] = useState(false);
-  const diagnosis = useContext(DiagnosisContext);
   const allSymptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
   const user = useSelector((state: ReduxState) => state.auth.user);
   const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
-  const symptoms = diagnosis.symptoms.filter(
-    (s) => (s.point > 0 || !s.point) && s.symptom.parents.length === 0
+  const diagnosis = useContext(DiagnosisContext);
+  const diagnosisSymptoms = diagnosis.symptoms.filter(
+    (s) => (s.point > 0 || !s.point) && !s.hidden
   );
 
   const handleRemove = async () => {
@@ -78,11 +78,13 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search }) => {
 
   const createExcess = () => {
     const excessSymptoms = allSymptoms.filter((s) => {
-      return (
-        selectedIds.includes(s.id) &&
-        (!totalSymptoms(diagnosis).includes(s.id) ||
-          diagnosis.symptoms.find((symp) => symp.symptom.id === s.id)?.point < 0)
-      );
+      const diagnosisSymptom = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
+      if (selectedIds.includes(s.id)) {
+        if (totalSymptoms(diagnosis).includes(s.id)) return false;
+        if (!diagnosisSymptom?.hidden) return false;
+        return true;
+      }
+      return false;
     });
 
     if (excessSymptoms.length === 0) {
@@ -136,11 +138,11 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search }) => {
       d.symptoms.filter((s) => selectedIds.includes(s.symptom.id)).some((s) => s.point < 0)
     )
       return true;
-    return chosenSymptoms(d).some((s) => s.point < 0);
+    return false;
   };
 
   const chosenSymptoms = (d: Diagnosis) => {
-    return d.symptoms.filter((s) => selectedIds.includes(s.symptom.id));
+    return diagnosisSymptoms.filter((s) => selectedIds.includes(s.symptom.id));
   };
 
   if (isEditing) return <DiagnosisInputRow diagnosis={diagnosis} setEditing={setEditing} />;
@@ -209,10 +211,10 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search }) => {
         <Table.Cell textAlign="center">{createAchieved()}</Table.Cell>
         <Table.Cell>
           {chosenSymptoms(diagnosis).length} /{' '}
-          {symptoms.filter((s) => !s.point || s.point > 0).length} (
+          {diagnosisSymptoms.filter((s) => !s.point || s.point > 0).length} (
           {(
             (chosenSymptoms(diagnosis).length /
-              symptoms.filter((s) => !s.point || s.point > 0).length || 0) * 100
+              diagnosisSymptoms.filter((s) => !s.point || s.point > 0).length || 0) * 100
           ).toFixed(0)}{' '}
           %)
         </Table.Cell>

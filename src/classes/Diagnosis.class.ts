@@ -19,6 +19,7 @@ class Diagnosis {
           ...Symptom
         }
         point
+        hidden
       }
       parents {
         id
@@ -277,6 +278,23 @@ class Diagnosis {
       mutation,
       { diagnosisId, includingId }
     );
+    store.dispatch(diagnosisReducer.actions.addDiagnosis(diagnosis));
+  };
+
+  static toggleHideSymptom = async (diagnosisId: number, symptomId: number) => {
+    const mutation = gql`
+      mutation ToggleHideDiagnosisSymptom($diagnosisId: Int, $symptomId: Int) {
+        toggleHideDiagnosisSymptom(diagnosisId: $diagnosisId, symptomId: $symptomId) {
+          ...Diagnosis
+        }
+      }
+      ${Diagnosis.fragment}
+    `;
+
+    const diagnosis = await Apollo.mutate<Diagnosis>('toggleHideDiagnosisSymptom', mutation, {
+      diagnosisId,
+      symptomId
+    });
     store.dispatch(diagnosisReducer.actions.addDiagnosis(diagnosis));
   };
 }

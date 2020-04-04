@@ -36,8 +36,9 @@ export type DiagnosisInput = {
 
 export type DiagnosisSymptom = {
    __typename?: 'DiagnosisSymptom';
-  point?: Maybe<Scalars['Int']>;
   symptom?: Maybe<Symptom>;
+  point?: Maybe<Scalars['Int']>;
+  hidden?: Maybe<Scalars['Boolean']>;
 };
 
 export type Mutation = {
@@ -54,6 +55,7 @@ export type Mutation = {
   addSymptomToDiagnosis?: Maybe<Diagnosis>;
   updateDiagnosisSymptom?: Maybe<Diagnosis>;
   removeSymptomFromDiagnosis?: Maybe<Diagnosis>;
+  toggleHideDiagnosisSymptom?: Maybe<Diagnosis>;
   addExcludingDiagnosisToDiagnosis?: Maybe<Diagnosis>;
   removeExcludingDiagnosisFromDiagnosis?: Maybe<Diagnosis>;
   addIncludingDiagnosisToDiagnosis?: Maybe<Diagnosis>;
@@ -118,6 +120,12 @@ export type MutationUpdateDiagnosisSymptomArgs = {
 
 
 export type MutationRemoveSymptomFromDiagnosisArgs = {
+  diagnosisId?: Maybe<Scalars['Int']>;
+  symptomId?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationToggleHideDiagnosisSymptomArgs = {
   diagnosisId?: Maybe<Scalars['Int']>;
   symptomId?: Maybe<Scalars['Int']>;
 };
