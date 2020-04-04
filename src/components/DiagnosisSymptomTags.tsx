@@ -4,11 +4,12 @@ import { DiagnosisContext } from './DiagnosisTable';
 import { totalSymptoms } from 'utils/utils';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
+import _ from 'lodash';
 
 export interface DiagnosisSymptomTagsProps {}
 
 const DiagnosisSymptomTags: React.SFC<DiagnosisSymptomTagsProps> = () => {
-  const symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
+  const symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms, _.isEqual);
   const diagnosis = useContext(DiagnosisContext);
   const symptomIds = totalSymptoms(diagnosis);
 
