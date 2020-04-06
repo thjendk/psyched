@@ -80,7 +80,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search }) => {
     const excessSymptoms = allSymptoms.filter((s) => {
       const diagnosisSymptom = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
       if (selectedIds.includes(s.id)) {
-        if (diagnosisSymptom.point < 0) return true;
+        if (diagnosisSymptom?.point < 0) return true;
         if (diagnosisSymptom?.hidden) return false;
         if (totalSymptoms(diagnosis).includes(s.id)) return false;
         return true;
