@@ -15,7 +15,7 @@ const DiagnosisSymptomTags: React.SFC<DiagnosisSymptomTagsProps> = () => {
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-      {symptomIds.slice().map((id) => (
+      {symptomIds.map((id) => (
         <SymptomTag
           diagnosisSymptom={diagnosis.symptoms.find((s) => s.symptom.id === id)}
           symptom={symptoms.find((s) => s.id === id)}

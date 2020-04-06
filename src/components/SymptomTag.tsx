@@ -14,9 +14,16 @@ export interface SymptomTagProps {
   diagnosisSymptom?: DiagnosisSymptom;
   style?: any;
   excess?: boolean;
+  hideChildren?: boolean;
 }
 
-const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom, style, diagnosisSymptom, excess }) => {
+const SymptomTag: React.SFC<SymptomTagProps> = ({
+  symptom,
+  style,
+  diagnosisSymptom,
+  excess,
+  hideChildren
+}) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [hiding, setHiding] = useState(false);
   const [removeLoading, setRemoveLoading] = useState(false);
@@ -51,6 +58,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom, style, diagnosisSympt
       return (
         <SymptomTag
           diagnosisSymptom={diagnosisSymptom}
+          hideChildren
           style={{
             backgroundColor: 'red',
             color: 'white'
@@ -60,6 +68,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom, style, diagnosisSympt
     return (
       <SymptomTag
         symptom={s}
+        hideChildren
         style={{
           backgroundColor: '#870000',
           color: 'white'
@@ -130,14 +139,15 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom, style, diagnosisSympt
               alignItems: 'flex-start'
             }}
           >
-            {s.children.map((s) => {
-              const chosenChild = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
-              if (!!chosenChild) return <SymptomTag diagnosisSymptom={chosenChild} />;
-              if (chosenChild?.point < 0) return null;
+            {!hideChildren &&
+              s.children.map((s) => {
+                const chosenChild = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
+                if (!!chosenChild) return <SymptomTag diagnosisSymptom={chosenChild} />;
+                if (chosenChild?.point < 0) return null;
 
-              const symptom = symptoms.find((symp) => symp.id === s.id);
-              return <SymptomTag symptom={symptom} />;
-            })}
+                const symptom = symptoms.find((symp) => symp.id === s.id);
+                return <SymptomTag symptom={symptom} />;
+              })}
           </div>
         </Tag>
       }

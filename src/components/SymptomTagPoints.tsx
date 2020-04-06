@@ -31,7 +31,7 @@ const SymptomTagPoints: React.SFC<SymptomTagPointsProps> = ({ symptom, diagnosis
   if (!symptom) return null;
   if (editing)
     return (
-      <Form onSubmit={handleSubmit}>
+      <Form as="span" onSubmit={handleSubmit}>
         <Input
           placeholder="Point"
           size="mini"
@@ -43,7 +43,12 @@ const SymptomTagPoints: React.SFC<SymptomTagPointsProps> = ({ symptom, diagnosis
         />
       </Form>
     );
-  if (point) return <span onClick={() => setEditing(true)}>{point}</span>;
+  if (point)
+    return (
+      <span style={{ marginLeft: '5px' }} onClick={() => setEditing(true)}>
+        {point}
+      </span>
+    );
   if (!point && user) return <Icon onClick={() => setEditing(true)} name="wrench" color="grey" />;
   return null;
 };

@@ -11,7 +11,7 @@ import SymptomTag from './SymptomTag';
 import Highlighter from 'react-highlighter';
 import DiagnosisIncludingInput from './DiagnosisIncludingInput';
 import DiagnosisExcludingInput from './DiagnosisExcludingInput';
-import { totalSymptoms } from 'utils/utils';
+import { allIds } from 'utils/utils';
 import { DiagnosisContext } from './DiagnosisTable';
 import DiagnosisSymptomTags from './DiagnosisSymptomTags';
 
@@ -82,7 +82,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search }) => {
       if (selectedIds.includes(s.id)) {
         if (diagnosisSymptom?.point < 0) return true;
         if (diagnosisSymptom?.hidden) return false;
-        if (totalSymptoms(diagnosis).includes(s.id)) return false;
+        if (allIds(diagnosis).includes(s.id)) return false;
         return true;
       }
       return false;

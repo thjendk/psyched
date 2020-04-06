@@ -18,32 +18,55 @@ export const colors = {
   }
 };
 
-const getParent = (s: Symptom): Symptom => {
-  const state = store.getState();
-  const symptoms = state.symptoms.symptoms;
-  s = symptoms.find((symp) => symp.id === s.id);
-
-  if (s.parents.length === 0) return s;
-  return getParent(s.parents[0]);
-};
-
-export const parentIds = (diagnosis: Diagnosis): number[] => {
-  const symptoms = diagnosis.symptoms.filter((s) => s.symptom.parents.length > 0);
-  if (symptoms.length === 0) return [];
-  let parents: Symptom[] = [];
-  for (let s of symptoms) {
-    const parent = getParent(s.symptom);
-    parents.push(parent);
-  }
-  return _.uniqBy(parents, (p) => p.id).map((s) => s.id);
-};
-
-const parentsAndChildren = (diagnosis: Diagnosis): number[] => {
+export const parentsAndChildren = (diagnosis: Diagnosis): number[] => {
   const filtered = diagnosis.symptoms
     .filter((s) => s.symptom.parents.length === 0)
     .map((s) => s.symptom.id);
   const parents = parentIds(diagnosis);
   return _.union(filtered, parents);
+};
+
+export const allIds = (d: Diagnosis): number[] => {
+  const state = store.getState();
+  const diagnoses = state.diagnoses.diagnoses;
+
+  const parents = _.union(
+    parentIds(d),
+    d.including.flatMap((d) => parentIds(diagnoses.find((diag) => diag.id === d.id))),
+    d.parents.flatMap((d) => parentIds(diagnoses.find((diag) => diag.id === d.id)))
+  );
+  return parents.flatMap((id) => [id, ...childIds(id)]);
+};
+
+export const parentIds = (diagnosis: Diagnosis): number[] => {
+  let parents: Symptom[] = [];
+  for (let s of diagnosis.symptoms) {
+    const parent = topParent(s.symptom);
+    parents.push(parent);
+  }
+  return _.uniqBy(parents, (p) => p.id).map((s) => s.id);
+};
+
+const topParent = (s: Symptom): Symptom => {
+  const state = store.getState();
+  const symptoms = state.symptoms.symptoms;
+  s = symptoms.find((symp) => symp.id === s.id);
+
+  if (s.parents.length === 0) return s;
+  return topParent(s.parents[0]);
+};
+
+/**
+ * Returns the child IDs from the entire tree, starting from the input and down
+ */
+const childIds = (id: number): number[] => {
+  const state = store.getState();
+  const symptoms = state.symptoms.symptoms;
+  const s = symptoms.find((s) => s.id === id);
+
+  if (s.children.length === 0) return [id];
+  const ids = s.children.reduce((r, s) => (r = [...r, s.id]), [] as number[]);
+  return ids.flatMap((id) => [id, ...childIds(id)]);
 };
 
 export const totalSymptoms = (diagnosis: Diagnosis): number[] => {
