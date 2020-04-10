@@ -6,11 +6,22 @@ import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import SymptomPickerRow, { SymptomPickerRowContainer } from './SymptomPickerRow';
 import _ from 'lodash';
+import styled from 'styled-components';
 
 export interface SymptomPickerBoxProps {
   symptoms: Symptom[];
   all?: boolean;
 }
+
+export const ChildRow = styled.div`
+  :nth-child(odd) {
+    background-color: #ededed;
+  }
+`;
+
+export const HeaderRow = styled.div`
+  background: #ccc;
+`;
 
 const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) => {
   const allSymptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
@@ -57,17 +68,25 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
 
             return (
               <>
-                {groupSymptom && <SymptomPickerRow symptom={groupSymptom} search={search} header />}
+                {groupSymptom && (
+                  <HeaderRow>
+                    <SymptomPickerRow symptom={groupSymptom} search={search} header />
+                  </HeaderRow>
+                )}
                 {!groupSymptom && (
-                  <SymptomPickerRowContainer style={{ fontWeight: 'bold', textAlign: 'center' }}>
-                    Ikke grupperet
-                  </SymptomPickerRowContainer>
+                  <HeaderRow>
+                    <SymptomPickerRowContainer style={{ fontWeight: 'bold', textAlign: 'center' }}>
+                      Ikke grupperet
+                    </SymptomPickerRowContainer>
+                  </HeaderRow>
                 )}
                 {groupSymptoms
                   .slice()
                   .sort(sorter)
                   .map((s) => (
-                    <SymptomPickerRow symptom={s} search={search} />
+                    <ChildRow>
+                      <SymptomPickerRow symptom={s} search={search} />
+                    </ChildRow>
                   ))}
               </>
             );

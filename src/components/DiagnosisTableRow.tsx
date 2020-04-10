@@ -41,9 +41,10 @@ export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
 
 export interface DiagnosisTableRowProps {
   search: String;
+  index: number;
 }
 
-const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search }) => {
+const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search, index }) => {
   const [adding, setAdding] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -149,7 +150,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search }) => {
   if (isEditing) return <DiagnosisInputRow diagnosis={diagnosis} setEditing={setEditing} />;
   return (
     <>
-      <Table.Row>
+      <Table.Row style={index % 2 !== 0 ? { backgroundColor: '#ededed' } : null}>
         <Table.Cell rowSpan={2}>
           <Highlighter search={search}>{diagnosis.name}</Highlighter>
         </Table.Cell>
@@ -253,7 +254,7 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search }) => {
           </Table.Cell>
         )}
       </Table.Row>
-      <Table.Row>
+      <Table.Row style={index % 2 !== 0 ? { backgroundColor: '#ededed' } : null}>
         <Table.Cell style={{ border: '1px solid #e3e3e3' }} colSpan={8}>
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
             <DiagnosisSymptomTags />

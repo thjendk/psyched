@@ -77,9 +77,9 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
           {diagnoses
             .slice()
             .sort(sorter)
-            .map((d) => (
+            .map((d, i) => (
               <DiagnosisContext.Provider value={d}>
-                <DiagnosisTableRow search={search} />
+                <DiagnosisTableRow index={i} search={search} />
               </DiagnosisContext.Provider>
             ))
             .concat(user && <DiagnosisInputRow />)}

@@ -10,14 +10,10 @@ import SymptomParentTag from './SymptomParentTag';
 import SymptomParentInput from './SymptomParentInput';
 
 export const SymptomPickerRowContainer = styled.p`
-  border: 1px solid lightgrey;
   border-bottom: 0px;
   padding: 5px 5px;
   margin: 0;
-
-  :last-child {
-    border-bottom: 1px solid lightgrey;
-  }
+  border-bottom: 1px solid grey;
 
   :hover {
     cursor: pointer;
