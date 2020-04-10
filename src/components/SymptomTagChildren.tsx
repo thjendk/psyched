@@ -25,9 +25,9 @@ const SymptomTagChildren: React.SFC<SymptomTagChildrenProps> = ({ parent, isHidd
     >
       {parent?.children.map((s) => {
         const chosenChild = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
+        if (chosenChild?.point < 0) return null;
         if (!!chosenChild)
           return <SymptomTag hidden={chosenChild.hidden} diagnosisSymptom={chosenChild} />;
-        if (chosenChild?.point < 0) return null;
 
         const symptom = symptoms.find((symp) => symp.id === s.id);
         return <SymptomTag hidden={isHidden} symptom={symptom} />;
