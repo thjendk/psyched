@@ -7,9 +7,10 @@ import Symptom from 'classes/Symptom.class';
 
 export interface SymptomTagChildrenProps {
   symptom: Symptom;
+  shouldHide?: boolean;
 }
 
-const SymptomTagChildren: React.SFC<SymptomTagChildrenProps> = ({ symptom: s }) => {
+const SymptomTagChildren: React.SFC<SymptomTagChildrenProps> = ({ symptom: s, shouldHide }) => {
   const diagnosis = useContext(DiagnosisContext);
   const symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
 
@@ -24,11 +25,11 @@ const SymptomTagChildren: React.SFC<SymptomTagChildrenProps> = ({ symptom: s }) 
     >
       {s?.children.map((s) => {
         const chosenChild = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
-        if (!!chosenChild) return <SymptomTag diagnosisSymptom={chosenChild} />;
+        if (!!chosenChild) return <SymptomTag hidden={shouldHide} diagnosisSymptom={chosenChild} />;
         if (chosenChild?.point < 0) return null;
 
         const symptom = symptoms.find((symp) => symp.id === s.id);
-        return <SymptomTag symptom={symptom} />;
+        return <SymptomTag hidden={shouldHide} symptom={symptom} />;
       })}
     </div>
   );
