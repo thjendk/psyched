@@ -16,7 +16,6 @@ export interface SymptomTagProps {
   style?: any;
   excess?: boolean;
   hideChildren?: boolean;
-  hidden?: boolean;
 }
 
 const SymptomTag: React.SFC<SymptomTagProps> = ({
@@ -24,8 +23,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
   style,
   diagnosisSymptom,
   excess,
-  hideChildren,
-  hidden
+  hideChildren
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [hiding, setHiding] = useState(false);
@@ -36,7 +34,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
   const diagnosis = useContext(DiagnosisContext);
   const s = symptom || diagnosisSymptom.symptom;
   const belongs = !!diagnosisSymptom;
-  const isHidden = (diagnosisSymptom?.hidden || hidden) && shouldHide;
+  const isHidden = diagnosisSymptom?.hidden && shouldHide;
 
   const handlePick = (id: number) => {
     Symptom.pick(id);
@@ -78,7 +76,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
       />
     );
   }
-  if (isHidden) return <SymptomTagChildren shouldHide symptom={symptom} />;
+  if (isHidden) return <SymptomTagChildren symptom={symptom} />;
   return (
     <Popup
       key={s.id}
