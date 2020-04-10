@@ -15,14 +15,16 @@ const DiagnosisSymptomTags: React.SFC<DiagnosisSymptomTagsProps> = () => {
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-      {symptomIds.map((id) => (
-        <SymptomTag
-          diagnosisSymptom={diagnosis.symptoms.find(
-            (s) => s.symptom.id === id && (!s.point || s.point >= 0)
-          )}
-          symptom={symptoms.find((s) => s.id === id)}
-        />
-      ))}
+      {symptomIds.map((id) => {
+        const diagnosisSymptom = diagnosis.symptoms.find((s) => s.symptom.id === id);
+        if (diagnosisSymptom?.point < 0) return null;
+        return (
+          <SymptomTag
+            diagnosisSymptom={diagnosisSymptom}
+            symptom={symptoms.find((s) => s.id === id)}
+          />
+        );
+      })}
     </div>
   );
 };

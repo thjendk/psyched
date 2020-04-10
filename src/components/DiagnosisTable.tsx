@@ -6,6 +6,7 @@ import { ReduxState } from 'redux/reducers';
 import LoadingPage from './misc/LoadingPage';
 import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
+import _ from 'lodash';
 export const DiagnosisContext = React.createContext<Diagnosis>(null);
 
 export interface DiagnosisTableProps {}
@@ -13,13 +14,15 @@ export interface DiagnosisTableProps {}
 const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
   const [search, setSearch] = useState('');
   const user = useSelector((state: ReduxState) => state.auth.user);
-  const diagnoses = useSelector((state: ReduxState) =>
-    state.diagnoses.diagnoses?.filter(
-      (d) =>
-        d.name.toLowerCase().includes(search.toLowerCase()) ||
-        d.description.toLowerCase().includes(search.toLowerCase()) ||
-        d.icdCode.toLowerCase().includes(search.toLowerCase())
-    )
+  const diagnoses = useSelector(
+    (state: ReduxState) =>
+      state.diagnoses.diagnoses?.filter(
+        (d) =>
+          d.name.toLowerCase().includes(search.toLowerCase()) ||
+          d.description.toLowerCase().includes(search.toLowerCase()) ||
+          d.icdCode.toLowerCase().includes(search.toLowerCase())
+      ),
+    _.isEqual
   );
   const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
 
