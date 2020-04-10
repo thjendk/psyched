@@ -8,6 +8,7 @@ import Diagnosis from 'classes/Diagnosis.class';
 import SymptomTagPoints from './SymptomTagPoints';
 import { DiagnosisSymptom } from 'types/generated';
 import { DiagnosisContext } from './DiagnosisTable';
+import SymptomTagChildren from './SymptomTagChildren';
 
 export interface SymptomTagProps {
   symptom?: Symptom;
@@ -29,11 +30,11 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
   const [removeLoading, setRemoveLoading] = useState(false);
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const user = useSelector((state: ReduxState) => state.auth.user);
-  const symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
   const shouldHide = useSelector((state: ReduxState) => state.settings.shouldHide);
   const diagnosis = useContext(DiagnosisContext);
   const s = symptom || diagnosisSymptom.symptom;
   const belongs = !!diagnosisSymptom;
+  const isHidden = diagnosisSymptom?.hidden && shouldHide;
 
   const handlePick = (id: number) => {
     Symptom.pick(id);
@@ -52,7 +53,6 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
     setRemoveLoading(false);
   };
 
-  if (diagnosisSymptom?.hidden && shouldHide && !excess) return null;
   if (excess) {
     if (diagnosisSymptom?.point < 0)
       return (
@@ -76,6 +76,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
       />
     );
   }
+  if (isHidden) return <SymptomTagChildren symptom={symptom} />;
   return (
     <Popup
       key={s.id}
@@ -83,6 +84,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
       disabled={!s.description}
       trigger={
         <Tag
+          hidden={isHidden}
           notParent={belongs && !diagnosisSymptom?.hidden}
           style={style}
           active={symptomIds.includes(s.id)}
@@ -131,24 +133,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
             />
           )}
           {hiding && <Loader inline active size="tiny" />}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-apart',
-              flexWrap: 'wrap',
-              alignItems: 'flex-start'
-            }}
-          >
-            {!hideChildren &&
-              s.children.map((s) => {
-                const chosenChild = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
-                if (!!chosenChild) return <SymptomTag diagnosisSymptom={chosenChild} />;
-                if (chosenChild?.point < 0) return null;
-
-                const symptom = symptoms.find((symp) => symp.id === s.id);
-                return <SymptomTag symptom={symptom} />;
-              })}
-          </div>
+          {!hideChildren && <SymptomTagChildren symptom={symptom} />}
         </Tag>
       }
     >
