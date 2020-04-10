@@ -78,7 +78,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
       />
     );
   }
-  if (isHidden) return <SymptomTagChildren shouldHide symptom={symptom} />;
+  if (isHidden) return <SymptomTagChildren isHidden parent={s} />;
   return (
     <Popup
       key={s.id}
@@ -135,7 +135,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
             />
           )}
           {hiding && <Loader inline active size="tiny" />}
-          {!hideChildren && <SymptomTagChildren symptom={symptom} />}
+          {!hideChildren && <SymptomTagChildren parent={s} />}
         </Tag>
       }
     >

@@ -6,11 +6,11 @@ import { ReduxState } from 'redux/reducers';
 import Symptom from 'classes/Symptom.class';
 
 export interface SymptomTagChildrenProps {
-  symptom: Symptom;
-  shouldHide?: boolean;
+  parent: Symptom;
+  isHidden?: boolean;
 }
 
-const SymptomTagChildren: React.SFC<SymptomTagChildrenProps> = ({ symptom: s, shouldHide }) => {
+const SymptomTagChildren: React.SFC<SymptomTagChildrenProps> = ({ parent, isHidden }) => {
   const diagnosis = useContext(DiagnosisContext);
   const symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
 
@@ -23,13 +23,14 @@ const SymptomTagChildren: React.SFC<SymptomTagChildrenProps> = ({ symptom: s, sh
         alignItems: 'flex-start'
       }}
     >
-      {s?.children.map((s) => {
+      {parent?.children.map((s) => {
         const chosenChild = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
-        if (!!chosenChild) return <SymptomTag hidden={shouldHide} diagnosisSymptom={chosenChild} />;
+        if (!!chosenChild)
+          return <SymptomTag hidden={chosenChild.hidden} diagnosisSymptom={chosenChild} />;
         if (chosenChild?.point < 0) return null;
 
         const symptom = symptoms.find((symp) => symp.id === s.id);
-        return <SymptomTag hidden={shouldHide} symptom={symptom} />;
+        return <SymptomTag hidden={isHidden} symptom={symptom} />;
       })}
     </div>
   );
