@@ -15,13 +15,15 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
   const [search, setSearch] = useState('');
   const user = useSelector((state: ReduxState) => state.auth.user);
   const symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms, _.isEqual);
-  const diagnoses = useSelector((state: ReduxState) =>
-    state.diagnoses.diagnoses?.filter(
-      (d) =>
-        d.name.toLowerCase().includes(search.toLowerCase()) ||
-        d.description.toLowerCase().includes(search.toLowerCase()) ||
-        d.icdCode.toLowerCase().includes(search.toLowerCase())
-    )
+  const diagnoses = useSelector(
+    (state: ReduxState) =>
+      state.diagnoses.diagnoses?.filter(
+        (d) =>
+          d.name.toLowerCase().includes(search.toLowerCase()) ||
+          d.description.toLowerCase().includes(search.toLowerCase()) ||
+          d.icdCode.toLowerCase().includes(search.toLowerCase())
+      ),
+    _.isEqual
   );
   const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
 
