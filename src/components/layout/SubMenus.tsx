@@ -25,6 +25,17 @@ const SubMenus: React.SFC<SubMenusProps> = ({ sidebarHide }) => {
           Frontpage
         </Menu.Item>
       </Menu.Menu>
+      <Menu.Item
+        style={{
+          flexGrow: 1,
+          justifyContent: 'center',
+          fontSize: '1.5em',
+          padding: 0,
+          marginRight: '1em'
+        }}
+      >
+        Psyched
+      </Menu.Item>
       <Menu.Menu position="right">
         {!user && (
           <Menu.Item onClick={() => handleNavigation('/login')}>
