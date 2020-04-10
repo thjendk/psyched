@@ -59,7 +59,7 @@ const topParent = (s: Symptom): Symptom => {
 /**
  * Returns the child IDs from the entire tree, starting from the input and down
  */
-const childIds = (id: number): number[] => {
+export const childIds = (id: number): number[] => {
   const state = store.getState();
   const symptoms = state.symptoms.symptoms;
   const s = symptoms.find((s) => s.id === id);

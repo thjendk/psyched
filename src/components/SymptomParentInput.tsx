@@ -4,6 +4,8 @@ import Symptom from 'classes/Symptom.class';
 import { Dropdown } from 'semantic-ui-react';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
+import { childIds } from 'utils/utils';
+import _ from 'lodash';
 
 export interface SymptomParentInputProps {
   symptom: Symptom;
@@ -13,8 +15,12 @@ const SymptomParentInput: React.SFC<SymptomParentInputProps> = ({ symptom }) => 
   const [editing, setEditing] = useState(false);
   const [parentId, setParentId] = useState<number>(null);
   const [submitting, setSubmitting] = useState(false);
-  const symptoms = useSelector((state: ReduxState) =>
-    state.symptoms.symptoms.filter((s) => s.id !== symptom.id)
+  const symptoms = useSelector(
+    (state: ReduxState) =>
+      state.symptoms.symptoms.filter(
+        (s) => s.id !== symptom.id && !childIds(symptom.id).includes(s.id)
+      ),
+    _.isEqual
   );
   const symptomOptions = symptoms.map((s) => ({ text: s.name, value: s.id, key: s.id }));
   const ref = useRef(null);
