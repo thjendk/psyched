@@ -76,6 +76,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
       />
     );
   }
+  if (diagnosisSymptom?.point < 0 && !excess) return null;
   return (
     <Popup
       key={s.id}
