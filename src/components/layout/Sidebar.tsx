@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SubMenus from './SubMenus';
 import { Menu, Sidebar as SemanticSidebar, Icon } from 'semantic-ui-react';
-import { MainLayout } from 'styles/layout';
+import { MainLayout } from './Layout';
 
 export interface SidebarProps {}
 

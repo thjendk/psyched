@@ -20,7 +20,6 @@ export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
   margin-top: 5px;
   cursor: pointer;
   border: ${(props) => (props.active ? '1px solid white' : '1px dashed black')};
-  white-space: nowrap;
 
   :hover {
     border: 1px solid black;
