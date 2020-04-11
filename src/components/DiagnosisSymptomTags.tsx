@@ -1,30 +1,31 @@
 import React, { useContext, useCallback } from 'react';
 import SymptomTag from './SymptomTag';
 import { DiagnosisContext } from './DiagnosisTable';
-import { totalSymptoms } from 'utils/utils';
+import { allIds } from 'utils/utils';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import _ from 'lodash';
+import Symptom from 'classes/Symptom.class';
 
 export interface DiagnosisSymptomTagsProps {}
 
 const DiagnosisSymptomTags: React.SFC<DiagnosisSymptomTagsProps> = () => {
-  const symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms, _.isEqual);
+  const symptoms: Symptom[] = useSelector(
+    (state: ReduxState) => state.symptoms.symptoms,
+    _.isEqual
+  );
   const diagnosis = useContext(DiagnosisContext);
   // eslint-disable-next-line
-  const symptomIds = useCallback(() => totalSymptoms(diagnosis), [diagnosis, symptoms]);
+  const symptomIds = useCallback(() => allIds(diagnosis), [diagnosis, symptoms]);
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
       {symptomIds().map((id) => {
+        const symptom = symptoms.find((s) => s.id === id);
+        if (symptom.parents.length > 0) return null;
         const diagnosisSymptom = diagnosis.symptoms.find((s) => s.symptom.id === id);
         if (diagnosisSymptom?.point < 0) return null;
-        return (
-          <SymptomTag
-            diagnosisSymptom={diagnosisSymptom}
-            symptom={symptoms.find((s) => s.id === id)}
-          />
-        );
+        return <SymptomTag diagnosisSymptom={diagnosisSymptom} symptom={symptom} />;
       })}
     </div>
   );

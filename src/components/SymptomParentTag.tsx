@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Symptom from 'classes/Symptom.class';
-import { Tag } from './DiagnosisTableRow';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import { Modal, Loader, Icon, Button } from 'semantic-ui-react';
+import { Tag } from './SymptomTag';
 
 export interface SymptomParentTagProps {
   symptom: Symptom;

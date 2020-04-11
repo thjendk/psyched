@@ -1,5 +1,4 @@
 import { store } from 'index';
-import Symptom from 'classes/Symptom.class';
 import Diagnosis from 'classes/Diagnosis.class';
 import _ from 'lodash';
 
@@ -18,87 +17,80 @@ export const colors = {
   }
 };
 
-export const parentsAndChildren = (diagnosis: Diagnosis): number[] => {
-  const filtered = diagnosis.symptoms
-    .filter((s) => s.symptom.parents.length === 0)
-    .map((s) => s.symptom.id);
-  const parents = parentIds(diagnosis);
-  return _.union(filtered, parents);
-};
-
 export const allIds = (d: Diagnosis): number[] => {
   const state = store.getState();
   const diagnoses = state.diagnoses.diagnoses;
 
   const parents = _.union(
-    parentIds(d),
-    d.including.flatMap((d) => parentIds(diagnoses.find((diag) => diag.id === d.id))),
-    d.parents.flatMap((d) => parentIds(diagnoses.find((diag) => diag.id === d.id)))
+    diagnosisParentIds(d),
+    d.including.flatMap((d) => allIds(diagnoses.find((diag) => diag.id === d.id))),
+    d.parents.flatMap((d) => allIds(diagnoses.find((diag) => diag.id === d.id)))
   );
-  return parents.flatMap((id) => [id, ...childIds(id)]);
+  return _.uniq(parents.flatMap((id) => [id, ...childIds(id)]));
 };
 
-export const parentIds = (diagnosis: Diagnosis): number[] => {
-  let parents: Symptom[] = [];
-  for (let s of diagnosis.symptoms) {
-    const parent = topParent(s.symptom);
-    parents.push(parent);
-  }
-  return _.uniqBy(parents, (p) => p.id).map((s) => s.id);
+export const diagnosisParentIds = (d: Diagnosis): number[] => {
+  const parentIds = d.symptoms.flatMap((s) => symptomTopParents(s.symptom.id));
+  return _.uniq(parentIds);
 };
 
-const topParent = (s: Symptom): Symptom => {
+const symptomTopParents = (symptomId: number): number[] => {
   const state = store.getState();
   const symptoms = state.symptoms.symptoms;
-  s = symptoms.find((symp) => symp.id === s.id);
+  const s = symptoms.find((s) => s.id === symptomId);
 
-  if (s.parents.length === 0) return s;
-  return topParent(s.parents[0]);
+  if (s.parents.length === 0) return [s.id];
+  return _.uniq(s.parents.flatMap((p) => symptomTopParents(p.id)));
 };
 
 /**
  * Returns the child IDs from the entire tree, starting from the input and down
  */
-export const childIds = (id: number): number[] => {
+export const childIds = (symptomId: number): number[] => {
   const state = store.getState();
   const symptoms = state.symptoms.symptoms;
-  const s = symptoms.find((s) => s.id === id);
+  const s = symptoms.find((s) => s.id === symptomId);
 
-  if (s.children.length === 0) return [id];
+  if (s.children.length === 0) return [symptomId];
   const ids = s.children.reduce((r, s) => (r = [...r, s.id]), [] as number[]);
-  return ids.flatMap((id) => [id, ...childIds(id)]);
+  return _.uniq(ids.flatMap((id) => [id, ...childIds(id)]));
 };
 
-export const totalSymptoms = (diagnosis: Diagnosis): number[] => {
+export const chosenSymptoms = (d: Diagnosis) => {
   const state = store.getState();
-  const diagnoses = state.diagnoses.diagnoses;
+  const symptoms = state.symptoms.symptoms;
+  const selectedIds = state.symptoms.selectedIds;
 
-  const symptoms = diagnosis.symptoms
-    .filter((s) => (!s.point || s.point > 0) && s.symptom.parents.length === 0)
-    .map((s) => s.symptom.id);
-  const parentSymptomIds = parentIds(diagnosis);
-  const includedIds = diagnosis.including.flatMap((d) =>
-    parentsAndChildren(diagnoses.find((diag) => diag.id === d.id))
-  );
-  const similarIds = diagnosis.parents.flatMap((d) =>
-    parentsAndChildren(diagnoses.find((diag) => diag.id === d.id))
-  );
-  return _.union(symptoms, parentSymptomIds, includedIds, similarIds);
+  const bannedIds = d.symptoms.filter((s) => s.point < 0 || s.hidden).map((s) => s.symptom.id);
+  const diagnosisSymptoms = allIds(d)
+    .filter((id) => !bannedIds.includes(id))
+    .map((id) => symptoms.find((s) => s.id === id));
+
+  return diagnosisSymptoms.filter((s) => selectedIds.includes(s.id));
 };
 
-export const addedSymptoms = (diagnosis: Diagnosis): number[] => {
+export const isAchieved = (d: Diagnosis) => {
   const state = store.getState();
   const diagnoses = state.diagnoses.diagnoses;
+  d = diagnoses.find((diag) => diag.id === d.id);
 
-  let symptomIds: number[] = [];
-  for (let d of diagnosis.including) {
-    d = diagnoses.find((diag) => diag.id === d.id);
-    symptomIds.push(...totalSymptoms(d));
-  }
-  for (let d of diagnosis.parents) {
-    d = diagnoses.find((diag) => diag.id === d.id);
-    symptomIds.push(...totalSymptoms(d));
-  }
+  if (hasConflict(d)) return false;
+  const sum = chosenSymptoms(d).reduce(
+    (sum, s) => (sum += d.symptoms.find((ds) => ds.symptom.id === s.id)?.point || 0),
+    0
+  );
+  return sum >= 100;
+};
 
-  return _.uniq(symptomIds);
+export const hasConflict = (d: Diagnosis) => {
+  const state = store.getState();
+  const selectedIds = state.symptoms.selectedIds;
+
+  if (
+    d.excluding.some((d) => isAchieved(d)) ||
+    d.including.some((d) => !isAchieved(d)) ||
+    d.symptoms.filter((s) => selectedIds.includes(s.symptom.id)).some((s) => s.point < 0)
+  )
+    return true;
+  return false;
 };

@@ -7,6 +7,7 @@ import LoadingPage from './misc/LoadingPage';
 import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
 import _ from 'lodash';
+import { allIds } from 'utils/utils';
 export const DiagnosisContext = React.createContext<Diagnosis>(null);
 
 export interface DiagnosisTableProps {}
@@ -14,7 +15,6 @@ export interface DiagnosisTableProps {}
 const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
   const [search, setSearch] = useState('');
   const user = useSelector((state: ReduxState) => state.auth.user);
-  const symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms, _.isEqual);
   const diagnoses = useSelector(
     (state: ReduxState) =>
       state.diagnoses.diagnoses?.filter(
@@ -36,7 +36,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
     };
 
     const numberOfSymptoms = (d: Diagnosis) => {
-      return d.symptoms.filter((s) => selectedIds.includes(s.symptom.id)).length;
+      return allIds(d).filter((id) => selectedIds.includes(id)).length;
     };
 
     if (points(a) < points(b)) return 1;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Input, Button, TextArea, Form, Divider } from 'semantic-ui-react';
+import { Table, Input, Button, TextArea, Form } from 'semantic-ui-react';
 import Diagnosis from 'classes/Diagnosis.class';
 import { useFormik } from 'formik';
 import { DiagnosisInput } from 'types/generated';
