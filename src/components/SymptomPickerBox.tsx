@@ -51,7 +51,7 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
         placeholder="Søg..."
       />
       <Divider />
-      <div style={{ overflowY: 'auto', height: '30vh' }}>
+      <div style={{ overflowY: 'auto', height: '50vh' }}>
         {[
           all &&
             (adding ? (
