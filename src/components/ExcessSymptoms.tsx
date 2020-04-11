@@ -18,13 +18,13 @@ const ExcessSymptoms: React.SFC<ExcessSymptomsProps> = () => {
     const excessSymptoms: Symptom[] = selectedIds
       .filter((id) => {
         const diagnosisSymptom = diagnosis.symptoms.find((symp) => symp.symptom.id === id);
+        if (allIds(diagnosis).includes(id)) return false;
         if (!!diagnosisSymptom) {
           if (diagnosisSymptom?.point < 0) return true;
           if (diagnosisSymptom?.hidden) return false;
-          if (allIds(diagnosis).includes(id)) return false;
           return true;
         }
-        return false;
+        return true;
       })
       .map((id) => symptoms.find((s) => s.id === id));
 
