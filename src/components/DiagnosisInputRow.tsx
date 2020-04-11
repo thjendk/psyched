@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Input, Button, TextArea } from 'semantic-ui-react';
+import { Table, Input, Button, TextArea, Form, Divider } from 'semantic-ui-react';
 import Diagnosis from 'classes/Diagnosis.class';
 import { useFormik } from 'formik';
 import { DiagnosisInput } from 'types/generated';
@@ -37,16 +37,18 @@ const DiagnosisInputRow: React.SFC<DiagnosisInputRowProps> = ({ diagnosis, setEd
 
   return (
     <Table.Row>
-      <Table.Cell>
-        <Input
-          placeholder="Navn"
-          name="name"
-          fluid
-          value={formik.values.name}
-          onChange={formik.handleChange}
-        />
+      <Table.Cell colSpan={3} style={{ borderTop: '2px solid black' }}>
+        <Form>
+          <TextArea
+            placeholder="Navn"
+            name="name"
+            fluid
+            value={formik.values.name}
+            onChange={formik.handleChange}
+          />
+        </Form>
       </Table.Cell>
-      <Table.Cell>
+      <Table.Cell style={{ borderTop: '2px solid black' }}>
         <Input
           placeholder="ICD-10 kode"
           fluid
@@ -55,20 +57,17 @@ const DiagnosisInputRow: React.SFC<DiagnosisInputRowProps> = ({ diagnosis, setEd
           onChange={formik.handleChange}
         />
       </Table.Cell>
-      <Table.Cell>
-        <TextArea
-          placeholder="Beskrivelse"
-          style={{ width: '100%' }}
-          value={formik.values.description}
-          onChange={(e, { value }) => formik.setFieldValue('description', value)}
-        />
+      <Table.Cell colSpan={4} style={{ borderTop: '2px solid black' }}>
+        <Form>
+          <TextArea
+            placeholder="Beskrivelse"
+            style={{ width: '100%' }}
+            value={formik.values.description}
+            onChange={(e, { value }) => formik.setFieldValue('description', value)}
+          />
+        </Form>
       </Table.Cell>
-      <Table.Cell />
-      <Table.Cell />
-      <Table.Cell />
-      <Table.Cell />
-      <Table.Cell />
-      <Table.Cell>
+      <Table.Cell style={{ borderTop: '2px solid black' }}>
         <Button
           loading={isAdding}
           disabled={isAdding}
