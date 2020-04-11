@@ -70,7 +70,7 @@ const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom, h
             justifyContent: 'space-between'
           }}
         >
-          <div>
+          <div style={{ whiteSpace: 'nowrap' }}>
             {[
               user && symptom.parents.length === 0 && <SymptomParentInput symptom={symptom} />,
               symptom.parents.map((p) => <SymptomParentTag symptom={symptom} parentId={p.id} />)
