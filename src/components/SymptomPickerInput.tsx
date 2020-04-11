@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Input, Button, TextArea } from 'semantic-ui-react';
+import { Input, Button, TextArea, Form } from 'semantic-ui-react';
 import styled from 'styled-components';
 import Symptom from 'classes/Symptom.class';
 
@@ -56,12 +56,14 @@ const SymptomPickerInput: React.SFC<SymptomPickerInputProps> = ({
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
-      <TextArea
-        style={{ width: '100%' }}
-        placeholder="Beskrivelse"
-        value={description}
-        onChange={(e, { value }) => setDescription(value as string)}
-      />
+      <Form>
+        <TextArea
+          style={{ width: '100%' }}
+          placeholder="Beskrivelse"
+          value={description}
+          onChange={(e, { value }) => setDescription(value as string)}
+        />
+      </Form>
       <div style={{ display: 'flex' }}>
         <Button.Group fluid>
           <Button

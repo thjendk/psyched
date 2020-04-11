@@ -14,9 +14,9 @@ export const typeDefs = gql`
   }
 
   type User {
-    id: Int!
-    username: String!
-    email: String!
+    id: Int
+    username: String
+    email: String
   }
 
   input UserInput {

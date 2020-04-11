@@ -3,6 +3,10 @@
 # Secret
 .env*
 
+# cypress
+cypress/videoes
+cypress/screenshots
+
 # dependencies
 /node_modules
 /.pnp

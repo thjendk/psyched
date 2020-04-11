@@ -8,7 +8,9 @@ export async function up(knex: Knex): Promise<any> {
     t.string('icd_code');
     t.integer('user_id')
       .unsigned()
-      .references('users.user_id');
+      .references('users.user_id')
+      .onDelete('SET NULL')
+      .onUpdate('SET NULL');
   });
 }
 
