@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useCallback } from 'react';
 import SymptomTag from './SymptomTag';
 import { DiagnosisContext } from './DiagnosisTable';
 import { totalSymptoms } from 'utils/utils';
@@ -11,11 +11,12 @@ export interface DiagnosisSymptomTagsProps {}
 const DiagnosisSymptomTags: React.SFC<DiagnosisSymptomTagsProps> = () => {
   const symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms, _.isEqual);
   const diagnosis = useContext(DiagnosisContext);
-  const symptomIds = totalSymptoms(diagnosis);
+  // eslint-disable-next-line
+  const symptomIds = useCallback(() => totalSymptoms(diagnosis), [diagnosis, symptoms]);
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-      {symptomIds.map((id) => {
+      {symptomIds().map((id) => {
         const diagnosisSymptom = diagnosis.symptoms.find((s) => s.symptom.id === id);
         if (diagnosisSymptom?.point < 0) return null;
         return (
