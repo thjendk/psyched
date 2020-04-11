@@ -85,8 +85,8 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
               <DiagnosisContext.Provider value={d}>
                 <DiagnosisTableRow index={i} search={search} />
               </DiagnosisContext.Provider>
-            ))
-            .concat(user && <DiagnosisInputRow />)}
+            ))}
+          {user && <DiagnosisInputRow />}
         </Table.Body>
       </Table>
     </div>
