@@ -5,43 +5,31 @@ import SymptomPickerInput from './SymptomPickerInput';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import SymptomPickerRow, { SymptomPickerRowContainer } from './SymptomPickerRow';
-import _ from 'lodash';
-import styled from 'styled-components';
 
 export interface SymptomPickerBoxProps {
   symptoms: Symptom[];
   all?: boolean;
 }
 
-export const ChildRow = styled.div`
-  :nth-child(odd) {
-    background-color: #ededed;
-  }
-`;
-
-export const HeaderRow = styled.div`
-  background: #ccc;
-`;
-
 const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) => {
   const allSymptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
   const [adding, setAdding] = useState(false);
   const [search, setSearch] = useState('');
   const user = useSelector((state: ReduxState) => state.auth.user);
-  symptoms = symptoms.filter(
-    (s) =>
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.description?.toLowerCase().includes(search.toLowerCase())
-  );
-  const groupedSymptoms = _(symptoms)
-    .sortBy((s) => s.parents[0]?.id)
-    .groupBy((s) => s.parents[0]?.id)
-    .value();
+
+  const doesIncludeSearch = (s: Symptom) => {
+    s = allSymptoms.find((symp) => symp.id === s.id);
+    if (s.name.includes(search) || s.description.includes(search)) return true;
+    if (s.children.length > 0) return s.children.some((s) => doesIncludeSearch(s));
+    return false;
+  };
 
   const sorter = (a: Symptom, b: Symptom) => {
     return a.name.localeCompare(b.name);
   };
 
+  symptoms = symptoms.filter((s) => doesIncludeSearch(s));
+  symptoms = symptoms.filter((s) => s.parents.length === 0);
   return (
     <div>
       <Input
@@ -52,46 +40,19 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
       />
       <Divider />
       <div style={{ overflowY: 'auto', height: '50vh' }}>
-        {[
-          all &&
-            (adding ? (
-              <SymptomPickerInput setAdding={setAdding} />
-            ) : (
-              user && (
-                <SymptomPickerRowContainer onClick={() => setAdding(true)}>
-                  + Tilføj symptom...
-                </SymptomPickerRowContainer>
-              )
-            )),
-          ..._.map(groupedSymptoms, (groupSymptoms, groupId) => {
-            const groupSymptom = allSymptoms.find((s) => s.id === Number(groupId));
-
-            return (
-              <>
-                {groupSymptom && (
-                  <HeaderRow>
-                    <SymptomPickerRow symptom={groupSymptom} search={search} header />
-                  </HeaderRow>
-                )}
-                {!groupSymptom && (
-                  <HeaderRow>
-                    <SymptomPickerRowContainer style={{ fontWeight: 'bold', textAlign: 'center' }}>
-                      Ikke grupperet
-                    </SymptomPickerRowContainer>
-                  </HeaderRow>
-                )}
-                {groupSymptoms
-                  .slice()
-                  .sort(sorter)
-                  .map((s) => (
-                    <ChildRow>
-                      <SymptomPickerRow symptom={s} search={search} />
-                    </ChildRow>
-                  ))}
-              </>
-            );
-          })
-        ]}
+        {all &&
+          (adding ? (
+            <SymptomPickerInput setAdding={setAdding} />
+          ) : (
+            user && (
+              <SymptomPickerRowContainer onClick={() => setAdding(true)}>
+                + Tilføj symptom...
+              </SymptomPickerRowContainer>
+            )
+          ))}
+        {symptoms.sort(sorter).map((s) => (
+          <SymptomPickerRow symptom={s} search={search} />
+        ))}
       </div>
     </div>
   );
