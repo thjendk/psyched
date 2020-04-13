@@ -12,9 +12,11 @@ const DiagnosisSymptomInput: React.SFC<DiagnosisSymptomInputProps> = () => {
   const diagnosis = useContext(DiagnosisContext);
   const [value, setValue] = useState<number>(null);
   let symptoms = useSelector((state: ReduxState) =>
-    state.symptoms.symptoms.filter(
-      (s) => !diagnosis.symptoms.map((ds) => ds.symptom.id).includes(s.id)
-    )
+    state.symptoms.symptoms.filter((s) => {
+      const dS = diagnosis.symptoms.find((ds) => ds.symptom.id === s.id);
+      if (!!dS && !dS.hidden) return false;
+      return true;
+    })
   );
   const symptomOptions = symptoms.map((s: Symptom) => ({
     text: s.name.toTitleCase(),

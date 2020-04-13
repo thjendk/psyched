@@ -79,15 +79,24 @@ export const resolvers: Resolvers = {
       return id;
     },
     addSymptomToDiagnosis: async (root, { symptomId, diagnosisId }, ctx) => {
-      await DiagnosisSymptoms.query().insert({ symptomId, diagnosisId, userId: ctx.user.userId });
+      const exists = await DiagnosisSymptoms.query().findOne({ symptomId, diagnosisId });
+      if (exists) {
+        await exists.$query().update({ hidden: 0, userId: ctx.user.userId });
+      } else {
+        await DiagnosisSymptoms.query().insert({ symptomId, diagnosisId, userId: ctx.user.userId });
+      }
       return { id: diagnosisId };
     },
     updateDiagnosisSymptom: async (root, { diagnosisId, symptomId, point }) => {
-      await DiagnosisSymptoms.query().where({ diagnosisId, symptomId }).update({ point });
+      await DiagnosisSymptoms.query()
+        .where({ diagnosisId, symptomId })
+        .update({ point });
       return { id: diagnosisId };
     },
     removeSymptomFromDiagnosis: async (root, { symptomId, diagnosisId }) => {
-      await DiagnosisSymptoms.query().where({ symptomId, diagnosisId }).delete();
+      await DiagnosisSymptoms.query()
+        .where({ symptomId, diagnosisId })
+        .delete();
       return { id: diagnosisId };
     },
     toggleHideDiagnosisSymptom: async (root, { diagnosisId, symptomId }) => {
@@ -114,7 +123,9 @@ export const resolvers: Resolvers = {
       return { id: diagnosisId };
     },
     removeExcludingDiagnosisFromDiagnosis: async (root, { diagnosisId, excludingId }) => {
-      await DiagnosisExcluding.query().where({ diagnosisId, excludingId }).delete();
+      await DiagnosisExcluding.query()
+        .where({ diagnosisId, excludingId })
+        .delete();
       return { id: diagnosisId };
     },
     addIncludingDiagnosisToDiagnosis: async (root, { diagnosisId, includingId }) => {
@@ -122,7 +133,9 @@ export const resolvers: Resolvers = {
       return { id: diagnosisId };
     },
     removeIncludingDiagnosisFromDiagnosis: async (root, { diagnosisId, includingId }) => {
-      await DiagnosisIncluding.query().where({ diagnosisId, includingId }).delete();
+      await DiagnosisIncluding.query()
+        .where({ diagnosisId, includingId })
+        .delete();
       return { id: diagnosisId };
     }
   },
