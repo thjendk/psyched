@@ -78,14 +78,11 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {diagnoses
-            .slice()
-            .sort(sorter)
-            .map((d, i) => (
-              <DiagnosisContext.Provider value={d}>
-                <DiagnosisTableRow index={i} search={search} />
-              </DiagnosisContext.Provider>
-            ))}
+          {diagnoses.sort(sorter).map((d, i) => (
+            <DiagnosisContext.Provider value={d}>
+              <DiagnosisTableRow index={i} search={search} />
+            </DiagnosisContext.Provider>
+          ))}
           {user && <DiagnosisInputRow />}
         </Table.Body>
       </Table>

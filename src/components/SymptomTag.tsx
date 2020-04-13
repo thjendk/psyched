@@ -45,6 +45,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [hiding, setHiding] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const [removeLoading, setRemoveLoading] = useState(false);
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const user = useSelector((state: ReduxState) => state.auth.user);
@@ -69,6 +70,12 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
     await Diagnosis.removeSymptom(diagnosis.id, id);
     setModalOpen(false);
     setRemoveLoading(false);
+  };
+
+  const handleAddSymptom = async () => {
+    setIsAdding(true);
+    await Diagnosis.addSymptom(diagnosis.id, symptom.id);
+    setIsAdding(false);
   };
 
   if (excess) {
@@ -143,12 +150,26 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
           )}
           <SymptomTagPoints diagnosis={diagnosis} symptom={diagnosisSymptom} />
           {user && (
-            <Icon
-              style={{ marginLeft: '4px' }}
-              color="grey"
-              onClick={toggleHideSymptom}
-              name={diagnosisSymptom?.hidden ? 'eye' : 'eye slash outline'}
-            />
+            <>
+              {!belongs && (
+                <>
+                  {isAdding && <Loader style={{ marginLeft: '5px' }} inline active size="tiny" />}
+                  {!isAdding && (
+                    <Icon
+                      style={{ marginLeft: '5px' }}
+                      color="grey"
+                      name={'check'}
+                      onClick={handleAddSymptom}
+                    />
+                  )}
+                </>
+              )}
+              <Icon
+                color="grey"
+                onClick={toggleHideSymptom}
+                name={diagnosisSymptom?.hidden ? 'eye' : 'eye slash outline'}
+              />
+            </>
           )}
           {hiding && <Loader inline active size="tiny" />}
           {!hideChildren && <SymptomTagChildren parent={s} />}
