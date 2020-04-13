@@ -5,11 +5,12 @@ import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import Symptom from 'classes/Symptom.class';
 import SymptomPickerBox from './SymptomPickerBox';
+import _ from 'lodash';
 
 export interface SymptomPickerProps {}
 
 const SymptomPicker: React.SFC<SymptomPickerProps> = () => {
-  let symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
+  let symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms, _.isEqual);
   const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const selected = symptoms.filter((s) => selectedIds.includes(s.id));
   symptoms = symptoms.filter((s) => !selectedIds.includes(s.id));
