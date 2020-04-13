@@ -94,3 +94,23 @@ export const hasConflict = (d: Diagnosis) => {
     return true;
   return false;
 };
+
+export const symptomCount = (diagnosis: Diagnosis) => {
+  const state = store.getState();
+  const symptoms = state.symptoms.symptoms;
+
+  const bannedIds = diagnosis.symptoms
+    .filter((s) => s.point < 0 || s.hidden)
+    .map((s) => s.symptom.id);
+
+  const diagnosisSymptoms = allIds(diagnosis)
+    .map((id) => symptoms.find((s) => s.id === id))
+    .filter((s) => !bannedIds.includes(s.id))
+    .filter(
+      (s) =>
+        !s.parents.some((p) => diagnosis.symptoms.find((ds) => ds.symptom.id === p.id)?.hidden) ||
+        !!diagnosis.symptoms.find((ds) => ds.symptom.id === s.id)
+    );
+
+  return diagnosisSymptoms.length;
+};
