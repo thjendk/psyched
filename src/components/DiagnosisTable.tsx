@@ -7,7 +7,7 @@ import LoadingPage from './misc/LoadingPage';
 import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
 import _ from 'lodash';
-import { allIds } from 'utils/utils';
+import { symptomCount } from 'utils/utils';
 export const DiagnosisContext = React.createContext<Diagnosis>(null);
 
 export interface DiagnosisTableProps {}
@@ -36,7 +36,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
     };
 
     const numberOfSymptoms = (d: Diagnosis) => {
-      return allIds(d).filter((id) => selectedIds.includes(id)).length;
+      return symptomCount(d);
     };
 
     if (points(a) < points(b)) return 1;
