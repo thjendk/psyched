@@ -29,7 +29,9 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
   };
 
   symptoms = symptoms.filter((s) => doesIncludeSearch(s));
-  symptoms = symptoms.filter((s) => s.parents.length === 0);
+  if (all) {
+    symptoms = symptoms.filter((s) => s.parents.length === 0);
+  }
   return (
     <div>
       <Input

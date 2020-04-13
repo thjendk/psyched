@@ -9,11 +9,12 @@ import SymptomPickerInput from './SymptomPickerInput';
 import SymptomParentTag from './SymptomParentTag';
 import SymptomParentInput from './SymptomParentInput';
 
-export const SymptomPickerRowContainer = styled.p`
+export const SymptomPickerRowContainer = styled.p<{ active?: boolean }>`
   border-bottom: 0px;
   padding: 5px 5px;
   margin: 0;
   border-bottom: 1px solid grey;
+  background-color: ${(props) => (props.active ? '#c5fac5' : null)};
 
   /* :nth-child(odd) {
     background-color: #ededed;
@@ -36,6 +37,7 @@ const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom })
   const [removing, setRemoving] = useState(false);
   const [editing, setEditing] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
 
   const handleRemove = async () => {
     setRemoving(true);
@@ -51,7 +53,7 @@ const SymptomPickerRow: React.SFC<SymptomPickerRowProps> = ({ search, symptom })
   if (editing) return <SymptomPickerInput symptom={symptom} setEditing={setEditing} />;
   return (
     <>
-      <SymptomPickerRowContainer>
+      <SymptomPickerRowContainer active={selectedIds.includes(symptom.id)}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div onClick={handlePick} style={{ width: '100%' }}>
             <Highlight search={search}>{symptom.name.toTitleCase()}</Highlight>
