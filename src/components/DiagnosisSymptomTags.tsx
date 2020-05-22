@@ -1,7 +1,7 @@
 import React, { useContext, useCallback } from 'react';
 import SymptomTag from './SymptomTag';
 import { DiagnosisContext } from './DiagnosisTable';
-import { allIds } from 'utils/utils';
+import { diagnosisParentIds } from 'utils/utils';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import _ from 'lodash';
@@ -16,7 +16,7 @@ const DiagnosisSymptomTags: React.SFC<DiagnosisSymptomTagsProps> = () => {
   );
   const diagnosis = useContext(DiagnosisContext);
   // eslint-disable-next-line
-  const symptomIds = useCallback(() => allIds(diagnosis), [diagnosis, symptoms]);
+  const symptomIds = useCallback(() => diagnosisParentIds(diagnosis), [diagnosis, symptoms]);
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
