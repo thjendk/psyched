@@ -12,14 +12,14 @@ const Login: React.FC<LoginProps> = () => {
   const [loginLoading, setLoginLoading] = useState(false);
 
   const handleLogin = async (values: FormikValues) => {
-    const { username, password, email } = values;
+    const { username, password } = values;
     if (!username || !password) {
       return setErrorMessage('Please provide all fields');
     }
 
     try {
       setLoginLoading(true);
-      await User.login({ username, password, email });
+      await User.login({ username, password });
       history.push('/');
     } catch (err) {
       setLoginLoading(false);

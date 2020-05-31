@@ -1,15 +1,14 @@
 import { Model } from 'objection';
 
 interface Symptoms {
-  symptomId: number;
+  id: number;
   name: string;
   description: string;
-  userId: number;
+  parentId: number;
 }
 
 class Symptoms extends Model {
   static tableName = 'symptoms';
-  static idColumn = 'symptomId';
 }
 
 export default Symptoms;

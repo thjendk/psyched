@@ -57,7 +57,7 @@ const DiagnosisInputRow: React.SFC<DiagnosisInputRowProps> = ({ diagnosis, setEd
           onChange={formik.handleChange}
         />
       </Table.Cell>
-      <Table.Cell colSpan={4} style={{ borderTop: '2px solid black' }}>
+      <Table.Cell colSpan={2} style={{ borderTop: '2px solid black' }}>
         <Form>
           <TextArea
             placeholder="Beskrivelse"

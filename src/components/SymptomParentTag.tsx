@@ -19,7 +19,7 @@ const SymptomParentTag: React.SFC<SymptomParentTagProps> = ({ symptom, parentId 
 
   const handleRemove = async () => {
     setRemoving(true);
-    await Symptom.removeParent(symptom.id, parentId);
+    await Symptom.addOrRemoveParent({ id: symptom.id, parentId });
     setRemoving(false);
   };
 

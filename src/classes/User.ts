@@ -16,7 +16,6 @@ class User {
         user {
           id
           username
-          email
         }
       }
     `;

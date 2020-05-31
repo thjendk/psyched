@@ -3,13 +3,11 @@ import { Table } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
-import DiagnosisSymptomInput from './DiagnosisSymptomInput';
+import GroupSymptomInput from './DiagnosisSymptomInput';
 import DiagnosisInputRow from './DiagnosisInputRow';
 import Highlighter from 'react-highlighter';
 import { DiagnosisContext } from './DiagnosisTable';
 import DiagnosisSymptomTags from './DiagnosisSymptomTags';
-import DiagnosisIncludingTags from './DiagnosisIncludingTags';
-import DiagnosisExcludingTags from './DiagnosisExcludingTags';
 import DiagnosisParentTags from './DiagnosisParentTags';
 import ExcessSymptoms from './ExcessSymptoms';
 import DiagnosisActions from './DiagnosisActions';
@@ -47,12 +45,6 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search, index })
           <Highlighter search={search}>{diagnosis.description}</Highlighter>
         </Table.Cell>
         <Table.Cell>
-          <DiagnosisIncludingTags />
-        </Table.Cell>
-        <Table.Cell>
-          <DiagnosisExcludingTags />
-        </Table.Cell>
-        <Table.Cell>
           <DiagnosisParentTags />
         </Table.Cell>
         <Table.Cell textAlign="center">
@@ -71,8 +63,14 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search, index })
         <Table.Cell style={{ border: '1px solid #e3e3e3' }} colSpan={8}>
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
             <DiagnosisSymptomTags />
-            {user && <DiagnosisSymptomInput />}
-            <Break />
+          </div>
+          {user && (
+            <>
+              <GroupSymptomInput />
+            </>
+          )}
+          <hr />
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
             <ExcessSymptoms />
           </div>
         </Table.Cell>

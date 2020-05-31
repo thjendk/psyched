@@ -7,7 +7,8 @@ import LoadingPage from './misc/LoadingPage';
 import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
 import _ from 'lodash';
-import { symptomCount } from 'utils/utils';
+import { diagnosisSymptoms } from 'utils/utils';
+import Group from 'classes/Group.class';
 export const DiagnosisContext = React.createContext<Diagnosis>(null);
 
 export interface DiagnosisTableProps {}
@@ -25,22 +26,17 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
       ),
     _.isEqual
   );
+  const groups = useSelector((state: ReduxState) => state.groups.groups);
   const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
 
   const sorter = (a: Diagnosis, b: Diagnosis) => {
-    const points = (d: Diagnosis) => {
-      const sum = d.symptoms
-        .filter((s) => selectedIds.includes(s.symptom.id))
-        .reduce((sum, s) => (sum += s?.point || 0), 0);
-      return sum / 100;
-    };
-
     const numberOfSymptoms = (d: Diagnosis) => {
-      return symptomCount(d);
+      return diagnosisSymptoms(d).reduce(
+        (sum, s) => (sum += selectedIds.includes(s.id) ? 1 : 0),
+        0
+      );
     };
 
-    if (points(a) < points(b)) return 1;
-    if (points(a) > points(b)) return -1;
     if (numberOfSymptoms(a) < numberOfSymptoms(b)) return 1;
     if (numberOfSymptoms(a) > numberOfSymptoms(b)) return -1;
     return a.icdCode.localeCompare(b.icdCode);
@@ -48,15 +44,16 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
 
   useEffect(() => {
     Diagnosis.fetch();
+    Group.fetchAll();
   }, []);
 
-  if (!diagnoses) return <LoadingPage />;
+  if (diagnoses.length === 0 || groups.length === 0) return <LoadingPage />;
   return (
     <div style={{ marginTop: '1em' }}>
       <Table celled size="small">
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell colSpan={user ? 9 : 8}>
+            <Table.HeaderCell colSpan={user ? 7 : 6}>
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -69,9 +66,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
             <Table.HeaderCell width={1}>Diagnose</Table.HeaderCell>
             <Table.HeaderCell style={{ width: '70px' }}>ICD-10</Table.HeaderCell>
             <Table.HeaderCell width={4}>Beskrivelse</Table.HeaderCell>
-            <Table.HeaderCell style={{ width: '130px' }}>Krævet</Table.HeaderCell>
-            <Table.HeaderCell style={{ width: '130px' }}>Udelukkende</Table.HeaderCell>
-            <Table.HeaderCell style={{ width: '130px' }}>Lignende</Table.HeaderCell>
+            <Table.HeaderCell style={{ width: '130px' }}>Fælles</Table.HeaderCell>
             <Table.HeaderCell width={1}>Opfyldt</Table.HeaderCell>
             <Table.HeaderCell width={1}>Antal</Table.HeaderCell>
             {user && <Table.HeaderCell width={1}>Muligheder</Table.HeaderCell>}

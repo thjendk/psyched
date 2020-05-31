@@ -7,15 +7,16 @@ import { ReduxState } from 'redux/reducers';
 import SymptomPickerRow, { SymptomPickerRowContainer } from './SymptomPickerRow';
 
 export interface SymptomPickerBoxProps {
-  symptoms: Symptom[];
-  all?: boolean;
+  symptoms?: Symptom[];
 }
 
-const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) => {
-  const allSymptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
+const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms }) => {
   const [adding, setAdding] = useState(false);
   const [search, setSearch] = useState('');
   const user = useSelector((state: ReduxState) => state.auth.user);
+  const allSymptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
+  const isLeftPicker = !symptoms;
+  symptoms = symptoms || allSymptoms.filter((s) => !s.parent);
 
   const doesIncludeSearch = (s: Symptom) => {
     s = allSymptoms.find((symp) => symp.id === s.id);
@@ -29,9 +30,6 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
   };
 
   symptoms = symptoms.filter((s) => doesIncludeSearch(s));
-  if (all) {
-    symptoms = symptoms.filter((s) => s.parents.length === 0);
-  }
   return (
     <div>
       <Input
@@ -42,7 +40,7 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms, all }) =
       />
       <Divider />
       <div style={{ overflowY: 'auto', height: '50vh' }}>
-        {all &&
+        {isLeftPicker &&
           (adding ? (
             <SymptomPickerInput setAdding={setAdding} />
           ) : (

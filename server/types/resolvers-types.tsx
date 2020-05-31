@@ -23,11 +23,14 @@ export type Diagnosis = {
   name?: Maybe<Scalars['String']>;
   icdCode?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
-  symptoms?: Maybe<Array<Maybe<DiagnosisSymptom>>>;
-  parents?: Maybe<Array<Maybe<Diagnosis>>>;
+  groups?: Maybe<Array<Maybe<Group>>>;
+  parent?: Maybe<Diagnosis>;
   children?: Maybe<Array<Maybe<Diagnosis>>>;
-  excluding?: Maybe<Array<Maybe<Diagnosis>>>;
-  including?: Maybe<Array<Maybe<Diagnosis>>>;
+};
+
+export type DiagnosisGroupInput = {
+  diagnosisId?: Maybe<Scalars['Int']>;
+  groupId?: Maybe<Scalars['Int']>;
 };
 
 export type DiagnosisInput = {
@@ -36,11 +39,27 @@ export type DiagnosisInput = {
   icdCode?: Maybe<Scalars['String']>;
 };
 
-export type DiagnosisSymptom = {
-   __typename?: 'DiagnosisSymptom';
-  symptom?: Maybe<Symptom>;
-  point?: Maybe<Scalars['Int']>;
-  hidden?: Maybe<Scalars['Boolean']>;
+export type DiagnosisParentInput = {
+  id?: Maybe<Scalars['Int']>;
+  parentId?: Maybe<Scalars['Int']>;
+};
+
+export type Group = {
+   __typename?: 'Group';
+  id?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+  index?: Maybe<Scalars['Int']>;
+  diagnosis?: Maybe<Diagnosis>;
+  parent?: Maybe<Group>;
+  children?: Maybe<Array<Maybe<Group>>>;
+  symptoms?: Maybe<Array<Maybe<Symptom>>>;
+};
+
+export type GroupInput = {
+  name?: Maybe<Scalars['String']>;
+  index?: Maybe<Scalars['Int']>;
+  diagnosisId?: Maybe<Scalars['Int']>;
+  parentId?: Maybe<Scalars['Int']>;
 };
 
 export type Mutation = {
@@ -52,21 +71,13 @@ export type Mutation = {
   createDiagnosis?: Maybe<Diagnosis>;
   updateDiagnosis?: Maybe<Diagnosis>;
   removeDiagnosis?: Maybe<Scalars['Int']>;
-  addDiagnosisParent?: Maybe<Diagnosis>;
-  removeDiagnosisParent?: Maybe<Diagnosis>;
-  addSymptomToDiagnosis?: Maybe<Diagnosis>;
-  updateDiagnosisSymptom?: Maybe<Diagnosis>;
-  removeSymptomFromDiagnosis?: Maybe<Diagnosis>;
-  toggleHideDiagnosisSymptom?: Maybe<Diagnosis>;
-  addExcludingDiagnosisToDiagnosis?: Maybe<Diagnosis>;
-  removeExcludingDiagnosisFromDiagnosis?: Maybe<Diagnosis>;
-  addIncludingDiagnosisToDiagnosis?: Maybe<Diagnosis>;
-  removeIncludingDiagnosisFromDiagnosis?: Maybe<Diagnosis>;
+  diagnosisParent?: Maybe<Diagnosis>;
   createSymptom?: Maybe<Symptom>;
   updateSymptom?: Maybe<Symptom>;
   removeSymptom?: Maybe<Scalars['Int']>;
-  addSymptomParent?: Maybe<Symptom>;
-  removeSymptomParent?: Maybe<Symptom>;
+  symptomParent?: Maybe<Symptom>;
+  addOrRemoveGroup?: Maybe<Group>;
+  symptomGroup?: Maybe<Group>;
 };
 
 
@@ -96,64 +107,8 @@ export type MutationRemoveDiagnosisArgs = {
 };
 
 
-export type MutationAddDiagnosisParentArgs = {
-  id?: Maybe<Scalars['Int']>;
-  parentId?: Maybe<Scalars['Int']>;
-};
-
-
-export type MutationRemoveDiagnosisParentArgs = {
-  id?: Maybe<Scalars['Int']>;
-  parentId?: Maybe<Scalars['Int']>;
-};
-
-
-export type MutationAddSymptomToDiagnosisArgs = {
-  diagnosisId?: Maybe<Scalars['Int']>;
-  symptomId?: Maybe<Scalars['Int']>;
-};
-
-
-export type MutationUpdateDiagnosisSymptomArgs = {
-  diagnosisId?: Maybe<Scalars['Int']>;
-  symptomId?: Maybe<Scalars['Int']>;
-  point?: Maybe<Scalars['Int']>;
-};
-
-
-export type MutationRemoveSymptomFromDiagnosisArgs = {
-  diagnosisId?: Maybe<Scalars['Int']>;
-  symptomId?: Maybe<Scalars['Int']>;
-};
-
-
-export type MutationToggleHideDiagnosisSymptomArgs = {
-  diagnosisId?: Maybe<Scalars['Int']>;
-  symptomId?: Maybe<Scalars['Int']>;
-};
-
-
-export type MutationAddExcludingDiagnosisToDiagnosisArgs = {
-  diagnosisId?: Maybe<Scalars['Int']>;
-  excludingId?: Maybe<Scalars['Int']>;
-};
-
-
-export type MutationRemoveExcludingDiagnosisFromDiagnosisArgs = {
-  diagnosisId?: Maybe<Scalars['Int']>;
-  excludingId?: Maybe<Scalars['Int']>;
-};
-
-
-export type MutationAddIncludingDiagnosisToDiagnosisArgs = {
-  diagnosisId?: Maybe<Scalars['Int']>;
-  includingId?: Maybe<Scalars['Int']>;
-};
-
-
-export type MutationRemoveIncludingDiagnosisFromDiagnosisArgs = {
-  diagnosisId?: Maybe<Scalars['Int']>;
-  includingId?: Maybe<Scalars['Int']>;
+export type MutationDiagnosisParentArgs = {
+  data?: Maybe<DiagnosisParentInput>;
 };
 
 
@@ -173,15 +128,18 @@ export type MutationRemoveSymptomArgs = {
 };
 
 
-export type MutationAddSymptomParentArgs = {
-  id?: Maybe<Scalars['Int']>;
-  parentId?: Maybe<Scalars['Int']>;
+export type MutationSymptomParentArgs = {
+  data?: Maybe<SymptomParentInput>;
 };
 
 
-export type MutationRemoveSymptomParentArgs = {
-  id?: Maybe<Scalars['Int']>;
-  parentId?: Maybe<Scalars['Int']>;
+export type MutationAddOrRemoveGroupArgs = {
+  data?: Maybe<GroupInput>;
+};
+
+
+export type MutationSymptomGroupArgs = {
+  data?: Maybe<SymptomGroupInput>;
 };
 
 export type Query = {
@@ -190,6 +148,7 @@ export type Query = {
   user?: Maybe<User>;
   diagnoses?: Maybe<Array<Maybe<Diagnosis>>>;
   symptoms?: Maybe<Array<Maybe<Symptom>>>;
+  groups?: Maybe<Array<Maybe<Group>>>;
 };
 
 export type Symptom = {
@@ -197,8 +156,13 @@ export type Symptom = {
   id?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
-  parents?: Maybe<Array<Maybe<Symptom>>>;
+  parent?: Maybe<Symptom>;
   children?: Maybe<Array<Maybe<Symptom>>>;
+};
+
+export type SymptomGroupInput = {
+  groupId?: Maybe<Scalars['Int']>;
+  symptomId?: Maybe<Scalars['Int']>;
 };
 
 export type SymptomInput = {
@@ -206,18 +170,21 @@ export type SymptomInput = {
   description?: Maybe<Scalars['String']>;
 };
 
+export type SymptomParentInput = {
+  id?: Maybe<Scalars['Int']>;
+  parentId?: Maybe<Scalars['Int']>;
+};
+
 
 export type User = {
    __typename?: 'User';
-  id: Scalars['Int'];
-  username: Scalars['String'];
-  email: Scalars['String'];
+  id?: Maybe<Scalars['Int']>;
+  username?: Maybe<Scalars['String']>;
 };
 
 export type UserInput = {
-  username: Scalars['String'];
-  password: Scalars['String'];
-  email: Scalars['String'];
+  username?: Maybe<Scalars['String']>;
+  password?: Maybe<Scalars['String']>;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -299,13 +266,18 @@ export type ResolversTypes = ResolversObject<{
   User: ResolverTypeWrapper<Partial<User>>,
   Int: ResolverTypeWrapper<Partial<Scalars['Int']>>,
   Diagnosis: ResolverTypeWrapper<Partial<Diagnosis>>,
-  DiagnosisSymptom: ResolverTypeWrapper<Partial<DiagnosisSymptom>>,
+  Group: ResolverTypeWrapper<Partial<Group>>,
   Symptom: ResolverTypeWrapper<Partial<Symptom>>,
-  Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']>>,
   Mutation: ResolverTypeWrapper<{}>,
   UserInput: ResolverTypeWrapper<Partial<UserInput>>,
   DiagnosisInput: ResolverTypeWrapper<Partial<DiagnosisInput>>,
+  DiagnosisParentInput: ResolverTypeWrapper<Partial<DiagnosisParentInput>>,
   SymptomInput: ResolverTypeWrapper<Partial<SymptomInput>>,
+  SymptomParentInput: ResolverTypeWrapper<Partial<SymptomParentInput>>,
+  GroupInput: ResolverTypeWrapper<Partial<GroupInput>>,
+  SymptomGroupInput: ResolverTypeWrapper<Partial<SymptomGroupInput>>,
+  Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']>>,
+  DiagnosisGroupInput: ResolverTypeWrapper<Partial<DiagnosisGroupInput>>,
   CacheControlScope: ResolverTypeWrapper<Partial<CacheControlScope>>,
   Upload: ResolverTypeWrapper<Partial<Scalars['Upload']>>,
 }>;
@@ -317,13 +289,18 @@ export type ResolversParentTypes = ResolversObject<{
   User: Partial<User>,
   Int: Partial<Scalars['Int']>,
   Diagnosis: Partial<Diagnosis>,
-  DiagnosisSymptom: Partial<DiagnosisSymptom>,
+  Group: Partial<Group>,
   Symptom: Partial<Symptom>,
-  Boolean: Partial<Scalars['Boolean']>,
   Mutation: {},
   UserInput: Partial<UserInput>,
   DiagnosisInput: Partial<DiagnosisInput>,
+  DiagnosisParentInput: Partial<DiagnosisParentInput>,
   SymptomInput: Partial<SymptomInput>,
+  SymptomParentInput: Partial<SymptomParentInput>,
+  GroupInput: Partial<GroupInput>,
+  SymptomGroupInput: Partial<SymptomGroupInput>,
+  Boolean: Partial<Scalars['Boolean']>,
+  DiagnosisGroupInput: Partial<DiagnosisGroupInput>,
   CacheControlScope: Partial<CacheControlScope>,
   Upload: Partial<Scalars['Upload']>,
 }>;
@@ -333,18 +310,20 @@ export type DiagnosisResolvers<ContextType = Context, ParentType extends Resolve
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   icdCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  symptoms?: Resolver<Maybe<Array<Maybe<ResolversTypes['DiagnosisSymptom']>>>, ParentType, ContextType>,
-  parents?: Resolver<Maybe<Array<Maybe<ResolversTypes['Diagnosis']>>>, ParentType, ContextType>,
+  groups?: Resolver<Maybe<Array<Maybe<ResolversTypes['Group']>>>, ParentType, ContextType>,
+  parent?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType>,
   children?: Resolver<Maybe<Array<Maybe<ResolversTypes['Diagnosis']>>>, ParentType, ContextType>,
-  excluding?: Resolver<Maybe<Array<Maybe<ResolversTypes['Diagnosis']>>>, ParentType, ContextType>,
-  including?: Resolver<Maybe<Array<Maybe<ResolversTypes['Diagnosis']>>>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
 
-export type DiagnosisSymptomResolvers<ContextType = Context, ParentType extends ResolversParentTypes['DiagnosisSymptom'] = ResolversParentTypes['DiagnosisSymptom']> = ResolversObject<{
-  symptom?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType>,
-  point?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
-  hidden?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
+export type GroupResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Group'] = ResolversParentTypes['Group']> = ResolversObject<{
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  index?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  diagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType>,
+  parent?: Resolver<Maybe<ResolversTypes['Group']>, ParentType, ContextType>,
+  children?: Resolver<Maybe<Array<Maybe<ResolversTypes['Group']>>>, ParentType, ContextType>,
+  symptoms?: Resolver<Maybe<Array<Maybe<ResolversTypes['Symptom']>>>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
 
@@ -356,21 +335,13 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   createDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationCreateDiagnosisArgs, never>>,
   updateDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationUpdateDiagnosisArgs, never>>,
   removeDiagnosis?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType, RequireFields<MutationRemoveDiagnosisArgs, never>>,
-  addDiagnosisParent?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationAddDiagnosisParentArgs, never>>,
-  removeDiagnosisParent?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationRemoveDiagnosisParentArgs, never>>,
-  addSymptomToDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationAddSymptomToDiagnosisArgs, never>>,
-  updateDiagnosisSymptom?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationUpdateDiagnosisSymptomArgs, never>>,
-  removeSymptomFromDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationRemoveSymptomFromDiagnosisArgs, never>>,
-  toggleHideDiagnosisSymptom?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationToggleHideDiagnosisSymptomArgs, never>>,
-  addExcludingDiagnosisToDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationAddExcludingDiagnosisToDiagnosisArgs, never>>,
-  removeExcludingDiagnosisFromDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationRemoveExcludingDiagnosisFromDiagnosisArgs, never>>,
-  addIncludingDiagnosisToDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationAddIncludingDiagnosisToDiagnosisArgs, never>>,
-  removeIncludingDiagnosisFromDiagnosis?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationRemoveIncludingDiagnosisFromDiagnosisArgs, never>>,
+  diagnosisParent?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationDiagnosisParentArgs, never>>,
   createSymptom?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType, RequireFields<MutationCreateSymptomArgs, never>>,
   updateSymptom?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType, RequireFields<MutationUpdateSymptomArgs, never>>,
   removeSymptom?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType, RequireFields<MutationRemoveSymptomArgs, never>>,
-  addSymptomParent?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType, RequireFields<MutationAddSymptomParentArgs, never>>,
-  removeSymptomParent?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType, RequireFields<MutationRemoveSymptomParentArgs, never>>,
+  symptomParent?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType, RequireFields<MutationSymptomParentArgs, never>>,
+  addOrRemoveGroup?: Resolver<Maybe<ResolversTypes['Group']>, ParentType, ContextType, RequireFields<MutationAddOrRemoveGroupArgs, never>>,
+  symptomGroup?: Resolver<Maybe<ResolversTypes['Group']>, ParentType, ContextType, RequireFields<MutationSymptomGroupArgs, never>>,
 }>;
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
@@ -378,13 +349,14 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>,
   diagnoses?: Resolver<Maybe<Array<Maybe<ResolversTypes['Diagnosis']>>>, ParentType, ContextType>,
   symptoms?: Resolver<Maybe<Array<Maybe<ResolversTypes['Symptom']>>>, ParentType, ContextType>,
+  groups?: Resolver<Maybe<Array<Maybe<ResolversTypes['Group']>>>, ParentType, ContextType>,
 }>;
 
 export type SymptomResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Symptom'] = ResolversParentTypes['Symptom']> = ResolversObject<{
   id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  parents?: Resolver<Maybe<Array<Maybe<ResolversTypes['Symptom']>>>, ParentType, ContextType>,
+  parent?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType>,
   children?: Resolver<Maybe<Array<Maybe<ResolversTypes['Symptom']>>>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
@@ -394,15 +366,14 @@ export interface UploadScalarConfig extends GraphQLScalarTypeConfig<ResolversTyp
 }
 
 export type UserResolvers<ContextType = Context, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
-  username?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  username?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
 
 export type Resolvers<ContextType = Context> = ResolversObject<{
   Diagnosis?: DiagnosisResolvers<ContextType>,
-  DiagnosisSymptom?: DiagnosisSymptomResolvers<ContextType>,
+  Group?: GroupResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
   Symptom?: SymptomResolvers<ContextType>,

@@ -2,35 +2,26 @@ import React, { useContext } from 'react';
 import { DiagnosisContext } from './DiagnosisTable';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
-import { hasConflict } from 'utils/utils';
 import { Icon } from 'semantic-ui-react';
+import { groupSymptoms, diagnosisSymptoms } from 'utils/utils';
 
 export interface DiagnosisAchievedProps {}
 
 const DiagnosisAchieved: React.SFC<DiagnosisAchievedProps> = () => {
   const diagnosis = useContext(DiagnosisContext);
   const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
+  const isAchieved = diagnosisSymptoms(diagnosis).reduce(
+    (sum, s) => (selectedIds.includes(s.id) ? (sum = true) : (sum = false)),
+    true
+  );
 
-  const sum = diagnosis.symptoms
-    .filter((s) => selectedIds.includes(s.symptom.id))
-    .reduce((sum, s) => (sum += s?.point || 0), 0);
-  if (hasConflict(diagnosis))
-    return (
-      <>
-        <Icon name="close" color="red" />
-        <br />
-        Udelukket grundet konflikt.
-        <br />
-        {sum}
-      </>
-    );
-  return sum >= 100 ? (
+  return isAchieved ? (
     <>
-      <Icon name="check" color="green" /> {sum}
+      <Icon name="check" color="green" />
     </>
   ) : (
     <>
-      <Icon name="close" color="red" /> {sum}
+      <Icon name="close" color="red" />
     </>
   );
 };

@@ -2,13 +2,15 @@ import * as Knex from 'knex';
 
 export async function up(knex: Knex): Promise<any> {
   return knex.schema.createTable('diagnoses', (t) => {
-    t.increments('diagnosis_id');
-    t.string('name');
+    t.increments();
+    t.text('name');
     t.text('description');
     t.string('icd_code');
-    t.integer('user_id')
+    t.integer('parent_id')
       .unsigned()
-      .references('users.user_id');
+      .references('diagnoses.id')
+      .onDelete('set null')
+      .onUpdate('cascade');
   });
 }
 

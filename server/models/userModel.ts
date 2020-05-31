@@ -4,18 +4,15 @@ import jwt from 'jsonwebtoken';
 const secret = process.env.SECRET || '';
 
 interface User {
-  userId: number;
+  id: number;
   username: string;
   password: string;
-  role: string;
-  email: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 class User extends Model {
   static tableName = 'users';
-  static idColumn = 'userId';
 
   $beforeInsert() {
     this.createdAt = new Date();
@@ -40,9 +37,9 @@ class User extends Model {
   }
 
   signToken() {
-    const { userId, username, email } = this;
+    const { id, username } = this;
 
-    return jwt.sign({ userId, username, email }, secret);
+    return jwt.sign({ id, username }, secret);
   }
 }
 

@@ -3,12 +3,9 @@ import Symptom from 'classes/Symptom.class';
 import { Popup, Modal, Icon, Button, Loader } from 'semantic-ui-react';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
-import Diagnosis from 'classes/Diagnosis.class';
-import SymptomTagPoints from './SymptomTagPoints';
-import { DiagnosisSymptom } from 'types/generated';
 import { DiagnosisContext } from './DiagnosisTable';
-import SymptomTagChildren from './SymptomTagChildren';
 import styled from 'styled-components';
+import Group from 'classes/Group.class';
 
 export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
   border-radius: 5px;
@@ -27,72 +24,34 @@ export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
 `;
 
 export interface SymptomTagProps {
-  symptom?: Symptom;
-  diagnosisSymptom?: DiagnosisSymptom;
+  symptom: Symptom;
   style?: any;
   excess?: boolean;
   hideChildren?: boolean;
-  hidden?: boolean;
 }
 
-const SymptomTag: React.SFC<SymptomTagProps> = ({
-  symptom,
-  style,
-  diagnosisSymptom,
-  excess,
-  hideChildren,
-  hidden
-}) => {
+const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom, style, excess }) => {
   const [modalOpen, setModalOpen] = useState(false);
-  const [hiding, setHiding] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
   const [removeLoading, setRemoveLoading] = useState(false);
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const user = useSelector((state: ReduxState) => state.auth.user);
-  const shouldHide = useSelector((state: ReduxState) => state.settings.shouldHide);
   const diagnosis = useContext(DiagnosisContext);
-  const s = symptom || diagnosisSymptom.symptom;
-  const belongs = !!diagnosisSymptom;
-  const isHidden = (diagnosisSymptom?.hidden || hidden) && shouldHide;
 
   const handlePick = (id: number) => {
     Symptom.pick(id);
   };
 
-  const toggleHideSymptom = async () => {
-    setHiding(true);
-    await Diagnosis.toggleHideSymptom(diagnosis.id, symptom?.id || diagnosisSymptom.symptom.id);
-    setHiding(false);
-  };
-
   const handleRemoveSymptom = async (id: number) => {
     setRemoveLoading(true);
-    await Diagnosis.removeSymptom(diagnosis.id, id);
+    await Group.addSymptom({ groupId: diagnosis.id, symptomId: id });
     setModalOpen(false);
     setRemoveLoading(false);
   };
 
-  const handleAddSymptom = async () => {
-    setIsAdding(true);
-    await Diagnosis.addSymptom(diagnosis.id, symptom.id);
-    setIsAdding(false);
-  };
-
   if (excess) {
-    if (diagnosisSymptom?.point < 0)
-      return (
-        <SymptomTag
-          diagnosisSymptom={diagnosisSymptom}
-          hideChildren
-          style={{
-            backgroundColor: 'red',
-            color: 'white'
-          }}
-        />
-      );
     return (
       <SymptomTag
-        symptom={s}
+        symptom={symptom}
         hideChildren
         style={{
           backgroundColor: '#870000',
@@ -101,21 +60,15 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
       />
     );
   }
-  if (isHidden) return <SymptomTagChildren isHidden parent={s} />;
   return (
     <Popup
-      key={s.id}
+      key={symptom.id}
       position="top center"
-      disabled={!s.description}
+      disabled={!symptom.description}
       trigger={
-        <Tag
-          hidden={isHidden}
-          notParent={belongs && !diagnosisSymptom?.hidden}
-          style={style}
-          active={symptomIds.includes(s.id)}
-        >
-          <span onClick={() => handlePick(s.id)}>{s.name.toTitleCase()}</span>
-          {user && belongs && (
+        <Tag style={style} active={symptomIds.includes(symptom.id)}>
+          <span onClick={() => handlePick(symptom.id)}>{symptom.name.toTitleCase()}</span>
+          {user && (
             <>
               <Modal
                 open={modalOpen}
@@ -129,7 +82,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
                 }
               >
                 <Modal.Header>
-                  Vil du fjerne {s.name} fra {diagnosis.name}?
+                  Vil du fjerne {symptom.name} fra {diagnosis.name}?
                 </Modal.Header>
                 <Modal.Actions>
                   <Button basic color="black" onClick={() => setModalOpen(false)}>
@@ -140,7 +93,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
                     color="red"
                     loading={removeLoading}
                     disabled={removeLoading}
-                    onClick={() => handleRemoveSymptom(s.id)}
+                    onClick={() => handleRemoveSymptom(symptom.id)}
                   >
                     <Icon name="trash" /> Ja
                   </Button>
@@ -148,35 +101,10 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({
               </Modal>
             </>
           )}
-          <SymptomTagPoints diagnosis={diagnosis} symptom={diagnosisSymptom} />
-          {user && (
-            <>
-              {!belongs && (
-                <>
-                  {isAdding && <Loader style={{ marginLeft: '5px' }} inline active size="tiny" />}
-                  {!isAdding && (
-                    <Icon
-                      style={{ marginLeft: '5px' }}
-                      color="grey"
-                      name={'check'}
-                      onClick={handleAddSymptom}
-                    />
-                  )}
-                </>
-              )}
-              <Icon
-                color="grey"
-                onClick={toggleHideSymptom}
-                name={diagnosisSymptom?.hidden ? 'eye' : 'eye slash outline'}
-              />
-            </>
-          )}
-          {hiding && <Loader inline active size="tiny" />}
-          {!hideChildren && <SymptomTagChildren parent={s} />}
         </Tag>
       }
     >
-      {s.description}
+      {symptom.description}
     </Popup>
   );
 };

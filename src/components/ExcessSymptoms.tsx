@@ -4,8 +4,8 @@ import { DiagnosisContext } from './DiagnosisTable';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import Symptom from 'classes/Symptom.class';
-import { allIds } from 'utils/utils';
 import { Icon } from 'semantic-ui-react';
+import { diagnosisSymptoms } from 'utils/utils';
 
 export interface ExcessSymptomsProps {}
 
@@ -17,13 +17,12 @@ const ExcessSymptoms: React.SFC<ExcessSymptomsProps> = () => {
   const createExcess = () => {
     const excessSymptoms: Symptom[] = selectedIds
       .filter((id) => {
-        const diagnosisSymptom = diagnosis.symptoms.find((symp) => symp.symptom.id === id);
-        if (allIds(diagnosis).includes(id)) return false;
-        if (!!diagnosisSymptom) {
-          if (diagnosisSymptom?.point < 0) return true;
-          if (diagnosisSymptom?.hidden) return false;
-          return true;
-        }
+        if (
+          diagnosisSymptoms(diagnosis)
+            .map((s) => s.id)
+            .includes(id)
+        )
+          return false;
         return true;
       })
       .map((id) => symptoms.find((s) => s.id === id));
@@ -33,8 +32,7 @@ const ExcessSymptoms: React.SFC<ExcessSymptomsProps> = () => {
     }
 
     const excess = excessSymptoms.map((s) => {
-      const exists = diagnosis.symptoms.find((symp) => symp.symptom.id === s.id);
-      return <SymptomTag excess symptom={s} diagnosisSymptom={exists} />;
+      return <SymptomTag excess symptom={s} />;
     });
 
     return excess;

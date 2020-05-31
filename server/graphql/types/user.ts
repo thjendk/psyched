@@ -14,15 +14,13 @@ export const typeDefs = gql`
   }
 
   type User {
-    id: Int!
-    username: String!
-    email: String!
+    id: Int
+    username: String
   }
 
   input UserInput {
-    username: String!
-    password: String!
-    email: String!
+    username: String
+    password: String
   }
 `;
 
@@ -31,8 +29,9 @@ export const resolvers = {
     user: async (obj, args, ctx: Context, info) => {
       if (!ctx.user) return null;
 
-      const user = await User.query().findById(ctx.user.userId);
-      return { id: user?.userId };
+      const user = await User.query().findById(ctx.user.id);
+      if (!user) return null;
+      return { id: user.id };
     }
   },
 
@@ -72,11 +71,6 @@ export const resolvers = {
       const user = await ctx.userLoader.load(id);
       if (!user) return null;
       return user.username;
-    },
-    email: async ({ id }, _, ctx: Context) => {
-      const user = await ctx.userLoader.load(id);
-      if (!user) return null;
-      return user.email;
     }
   }
 };

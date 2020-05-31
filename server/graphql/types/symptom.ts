@@ -1,7 +1,6 @@
 import { gql } from 'apollo-server-express';
 import { Resolvers } from 'types/resolvers-types';
 import Symptoms from 'models/symptoms.model';
-import SymptomParent from 'models/symptomsParents.model';
 
 export const typeDefs = gql`
   extend type Query {
@@ -12,15 +11,14 @@ export const typeDefs = gql`
     createSymptom(data: SymptomInput): Symptom
     updateSymptom(id: Int, data: SymptomInput): Symptom
     removeSymptom(id: Int): Int
-    addSymptomParent(id: Int, parentId: Int): Symptom
-    removeSymptomParent(id: Int, parentId: Int): Symptom
+    symptomParent(data: SymptomParentInput): Symptom
   }
 
   type Symptom {
     id: Int
     name: String
     description: String
-    parents: [Symptom]
+    parent: Symptom
     children: [Symptom]
   }
 
@@ -28,39 +26,47 @@ export const typeDefs = gql`
     name: String
     description: String
   }
+
+  input SymptomParentInput {
+    id: Int
+    parentId: Int
+  }
 `;
 
 export const resolvers: Resolvers = {
   Query: {
     symptoms: async () => {
       const symptoms = await Symptoms.query();
-      return symptoms.map((s) => ({ id: s.symptomId }));
+      return symptoms.map((s) => ({ id: s.id }));
     }
   },
 
   Mutation: {
     createSymptom: async (root, { data }, ctx) => {
-      const symptom = await Symptoms.query().insertAndFetch({ ...data, userId: ctx.user.userId });
-      return { id: symptom.symptomId };
+      const symptom = await Symptoms.query().insertAndFetch({ ...data });
+      return { id: symptom.id };
     },
     updateSymptom: async (root, { id, data }, ctx) => {
       const symptom = await Symptoms.query()
-        .updateAndFetchById(id, { ...data, userId: ctx.user.userId })
+        .updateAndFetchById(id, { ...data })
         .skipUndefined();
-      return { id: symptom.symptomId };
+      return { id: symptom.id };
     },
     removeSymptom: async (root, { id }) => {
       await Symptoms.query().deleteById(id);
       return id;
     },
-    addSymptomParent: async (root, { id, parentId }, ctx) => {
-      await SymptomParent.query().insert({ symptomId: id, parentId, userId: ctx.user.userId });
-      return { id };
-    },
-    removeSymptomParent: async (root, { id, parentId }) => {
-      await SymptomParent.query()
-        .where({ symptomId: id, parentId })
-        .delete();
+    symptomParent: async (root, { data: { id, parentId } }, ctx) => {
+      const exists = await Symptoms.query().findOne({ id, parentId });
+
+      if (exists) {
+        await exists.$query().delete();
+      } else {
+        await Symptoms.query()
+          .findById(id)
+          .update({ parentId });
+      }
+
       return { id };
     }
   },
@@ -75,13 +81,14 @@ export const resolvers: Resolvers = {
       const symptom = await ctx.symptomLoader.load(id);
       return symptom.description;
     },
-    parents: async ({ id }) => {
-      const parents = await SymptomParent.query().where({ symptomId: id });
-      return parents.map((p) => ({ id: p.parentId }));
+    parent: async ({ id }, args, ctx) => {
+      const symptom = await ctx.symptomLoader.load(id);
+      if (!symptom.parentId) return null;
+      return { id: symptom.parentId };
     },
     children: async ({ id }) => {
-      const parents = await SymptomParent.query().where({ parentId: id });
-      return parents.map((p) => ({ id: p.symptomId }));
+      const parents = await Symptoms.query().where({ parentId: id });
+      return parents.map((p) => ({ id: p.id }));
     }
   }
 };

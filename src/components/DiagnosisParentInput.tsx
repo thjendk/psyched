@@ -12,11 +12,11 @@ const DiagnosisParentInput: React.SFC<DiagnosisParentInputProps> = ({ diagnosis 
   const [value, setValue] = useState<number>(null);
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
   const diagnosisOptions = diagnoses
-    .filter((d) => !diagnosis.parents.map((p) => p.id).includes(d.id))
+    .filter((d) => diagnosis.parent?.id !== d.id)
     .map((d) => ({ text: d.name, value: d.id, key: d.id }));
 
   const handleSubmit = async () => {
-    await Diagnosis.addParent(diagnosis.id, value);
+    await Diagnosis.addOrRemoveParent({ id: diagnosis.id, parentId: value });
   };
 
   return (

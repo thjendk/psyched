@@ -1,4 +1,4 @@
-import { Symptom as SymptomType, SymptomInput } from 'types/generated';
+import { Symptom as SymptomType, SymptomInput, SymptomParentInput } from 'types/generated';
 import { gql } from 'apollo-boost';
 import { store } from 'index';
 import symptomReducer from 'redux/reducers/symptoms';
@@ -12,7 +12,7 @@ class Symptom {
       id
       name
       description
-      parents {
+      parent {
         id
       }
       children {
@@ -32,13 +32,9 @@ class Symptom {
     `;
 
     try {
-      store.dispatch(symptomReducer.actions.setStatus('loading'));
       const symptoms = await Apollo.query<Symptom[]>('symptoms', query);
       store.dispatch(symptomReducer.actions.setSymptoms(symptoms));
-      store.dispatch(symptomReducer.actions.setStatus('success'));
-    } catch (error) {
-      store.dispatch(symptomReducer.actions.setStatus('error'));
-    }
+    } catch (error) {}
   };
 
   static pick = async (id: number) => {
@@ -56,13 +52,9 @@ class Symptom {
     `;
 
     try {
-      store.dispatch(symptomReducer.actions.setStatus('loading'));
       const symptom = await Apollo.mutate<Symptom>('createSymptom', mutation, { data });
       store.dispatch(symptomReducer.actions.addSymptom(symptom));
-      store.dispatch(symptomReducer.actions.setStatus('success'));
-    } catch (error) {
-      store.dispatch(symptomReducer.actions.setStatus('error'));
-    }
+    } catch (error) {}
   };
 
   static update = async (id: number, data: SymptomInput) => {
@@ -90,31 +82,17 @@ class Symptom {
     store.dispatch(symptomReducer.actions.removeSymptom(result));
   };
 
-  static addParent = async (id: number, parentId: number) => {
+  static addOrRemoveParent = async (data: SymptomParentInput) => {
     const mutation = gql`
-      mutation AddSymptomParent($id: Int, $parentId: Int) {
-        addSymptomParent(id: $id, parentId: $parentId) {
+      mutation SymptomParent($data: SymptomParentInput) {
+        addSymptomParent(data: $data) {
           ...Symptom
         }
       }
       ${Symptom.fragment}
     `;
 
-    const symptom = await Apollo.mutate<Symptom>('addSymptomParent', mutation, { id, parentId });
-    store.dispatch(symptomReducer.actions.addSymptom(symptom));
-  };
-
-  static removeParent = async (id: number, parentId: number) => {
-    const mutation = gql`
-      mutation RemoveSymptomParent($id: Int, $parentId: Int) {
-        removeSymptomParent(id: $id, parentId: $parentId) {
-          ...Symptom
-        }
-      }
-      ${Symptom.fragment}
-    `;
-
-    const symptom = await Apollo.mutate<Symptom>('removeSymptomParent', mutation, { id, parentId });
+    const symptom = await Apollo.mutate<Symptom>('addSymptomParent', mutation, { data });
     store.dispatch(symptomReducer.actions.addSymptom(symptom));
   };
 }

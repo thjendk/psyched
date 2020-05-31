@@ -25,7 +25,7 @@ const SymptomPicker: React.SFC<SymptomPickerProps> = () => {
       <Grid.Column>
         <Segment>
           <p>Alle symptomer</p>
-          <SymptomPickerBox all symptoms={symptoms} />
+          <SymptomPickerBox />
         </Segment>
       </Grid.Column>
       <Grid.Column>
