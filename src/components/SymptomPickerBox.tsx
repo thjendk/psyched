@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import Symptom from 'classes/Symptom.class';
 import { Input, Divider } from 'semantic-ui-react';
 import SymptomPickerInput from './SymptomPickerInput';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import SymptomPickerRow, { SymptomPickerRowContainer } from './SymptomPickerRow';
+import settingsReducer from 'redux/reducers/settings';
 
 export interface SymptomPickerBoxProps {
   symptoms?: Symptom[];
@@ -12,11 +13,19 @@ export interface SymptomPickerBoxProps {
 
 const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms }) => {
   const [adding, setAdding] = useState(false);
-  const [search, setSearch] = useState('');
+  const dispatch = useDispatch();
   const user = useSelector((state: ReduxState) => state.auth.user);
   const allSymptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
   const isLeftPicker = !symptoms;
+  const search = useSelector((state: ReduxState) =>
+    isLeftPicker ? state.settings.symptomSearchLeft : state.settings.symptomSearchRight
+  );
   symptoms = symptoms || allSymptoms.filter((s) => !s.parent);
+
+  const handleSearch = (value: string) => {
+    if (isLeftPicker) dispatch(settingsReducer.actions.setSymptomSearchLeft(value));
+    if (!isLeftPicker) dispatch(settingsReducer.actions.setSymptomSearchRight(value));
+  };
 
   const doesIncludeSearch = (s: Symptom) => {
     s = allSymptoms.find((symp) => symp.id === s.id);
@@ -35,7 +44,7 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms }) => {
       <Input
         fluid
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => handleSearch(e.target.value)}
         placeholder="Søg..."
       />
       <Divider />

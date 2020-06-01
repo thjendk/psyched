@@ -24,7 +24,7 @@ export const groupSymptoms = (g: Group): Symptom[] => {
 
   g = state.groups.groups.find((group) => group.id === g.id);
 
-  if (g.children.length === 0) return [];
+  if (g.children.length === 0) return g.symptoms;
   return _.unionBy(
     [...g.symptoms, ...g.children.flatMap((group) => groupSymptoms(group))],
     (s) => s.id

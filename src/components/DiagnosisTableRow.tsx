@@ -1,25 +1,16 @@
 import React, { useState, useContext } from 'react';
 import { Table } from 'semantic-ui-react';
-import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
-import GroupSymptomInput from './DiagnosisSymptomInput';
 import DiagnosisInputRow from './DiagnosisInputRow';
 import Highlighter from 'react-highlighter';
 import { DiagnosisContext } from './DiagnosisTable';
 import DiagnosisSymptomTags from './DiagnosisSymptomTags';
 import DiagnosisParentTags from './DiagnosisParentTags';
-import ExcessSymptoms from './ExcessSymptoms';
 import DiagnosisActions from './DiagnosisActions';
 import DiagnosisAchieved from './DiagnosisAchieved';
 import SymptomCount from './SymptomCount';
-
-const Break = styled.div`
-  flex-basis: 100%;
-  border-bottom: 1px solid lightgrey;
-  height: 5px;
-  padding: 5px;
-`;
+import GroupInput from './GroupInput';
 
 export interface DiagnosisTableRowProps {
   search: String;
@@ -61,18 +52,13 @@ const DiagnosisTableRow: React.SFC<DiagnosisTableRowProps> = ({ search, index })
       </Table.Row>
       <Table.Row style={index % 2 !== 0 ? { backgroundColor: '#ededed' } : null}>
         <Table.Cell style={{ border: '1px solid #e3e3e3' }} colSpan={8}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-            <DiagnosisSymptomTags />
-          </div>
+          <DiagnosisSymptomTags />
           {user && (
-            <>
-              <GroupSymptomInput />
-            </>
+            <div>
+              <hr />
+              <GroupInput />
+            </div>
           )}
-          <hr />
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-            <ExcessSymptoms />
-          </div>
         </Table.Cell>
       </Table.Row>
     </>

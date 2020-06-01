@@ -16,22 +16,25 @@ const DiagnosisParentTags: React.SFC<DiagnosisParentTagsProps> = () => {
   const user = useSelector((state: ReduxState) => state.auth.user);
   const p = diagnoses.find((d) => d.id === diagnosis.parent?.id);
   const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
-  const isAchieved = diagnosisSymptoms(diagnosis).reduce(
-    (sum, s) => (sum = selectedIds.includes(s.id) ? true : false),
-    true
-  );
+  const isAchieved = p
+    ? diagnosisSymptoms(p).reduce(
+        (sum, s) => (sum = selectedIds.includes(s.id) ? sum : false),
+        true
+      )
+    : false;
 
   const handleSubmit = async (parentId: number) => {
     await Diagnosis.addOrRemoveParent({ id: diagnosis.id, parentId });
   };
 
-  if (diagnosis.parent) return null;
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-      <Tag active={isAchieved}>
-        {diagnoses.find((d) => d.id === p?.id)?.name}
-        {user && <Icon onClick={() => handleSubmit(p.id)} name="close" color="grey" />}
-      </Tag>
+      {diagnosis.parent && (
+        <Tag active={isAchieved}>
+          {diagnoses.find((d) => d.id === p.id).name}
+          {user && <Icon onClick={() => handleSubmit(p.id)} name="close" color="grey" />}
+        </Tag>
+      )}
       {user && <DiagnosisParentInput diagnosis={diagnosis} />}
     </div>
   );

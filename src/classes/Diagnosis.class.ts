@@ -3,6 +3,7 @@ import { gql } from 'apollo-boost';
 import Apollo from './Apollo';
 import { store } from 'index';
 import diagnosisReducer from 'redux/reducers/diagnoses.reducer';
+import Symptom from './Symptom.class';
 
 interface Diagnosis extends DiagnosisType {}
 
@@ -15,6 +16,17 @@ class Diagnosis {
       description
       groups {
         id
+        name
+        index
+        symptoms {
+          ...Symptom
+        }
+        children {
+          id
+        }
+        parent {
+          id
+        }
       }
       parent {
         id
@@ -23,6 +35,7 @@ class Diagnosis {
         id
       }
     }
+    ${Symptom.fragment}
   `;
 
   static fetch = async () => {
@@ -94,7 +107,7 @@ class Diagnosis {
       ${Diagnosis.fragment}
     `;
 
-    const diagnosis = await Apollo.mutate<Diagnosis>('addDiagnosisParent', mutation, {
+    const diagnosis = await Apollo.mutate<Diagnosis>('diagnosisParent', mutation, {
       data
     });
     store.dispatch(diagnosisReducer.actions.addDiagnosis(diagnosis));

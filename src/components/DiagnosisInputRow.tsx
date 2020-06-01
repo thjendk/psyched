@@ -38,7 +38,7 @@ const DiagnosisInputRow: React.SFC<DiagnosisInputRowProps> = ({ diagnosis, setEd
   return (
     <Table.Row>
       <Table.Cell colSpan={3} style={{ borderTop: '2px solid black' }}>
-        <Form>
+        <Form onSubmit={() => formik.handleSubmit()}>
           <TextArea
             placeholder="Navn"
             name="name"
@@ -49,16 +49,18 @@ const DiagnosisInputRow: React.SFC<DiagnosisInputRowProps> = ({ diagnosis, setEd
         </Form>
       </Table.Cell>
       <Table.Cell style={{ borderTop: '2px solid black' }}>
-        <Input
-          placeholder="ICD-10 kode"
-          fluid
-          name="icdCode"
-          value={formik.values.icdCode}
-          onChange={formik.handleChange}
-        />
+        <Form onSubmit={() => formik.handleSubmit()}>
+          <Input
+            placeholder="ICD-10 kode"
+            fluid
+            name="icdCode"
+            value={formik.values.icdCode}
+            onChange={formik.handleChange}
+          />
+        </Form>
       </Table.Cell>
       <Table.Cell colSpan={2} style={{ borderTop: '2px solid black' }}>
-        <Form>
+        <Form onSubmit={() => formik.handleSubmit()}>
           <TextArea
             placeholder="Beskrivelse"
             style={{ width: '100%' }}
@@ -68,26 +70,28 @@ const DiagnosisInputRow: React.SFC<DiagnosisInputRowProps> = ({ diagnosis, setEd
         </Form>
       </Table.Cell>
       <Table.Cell style={{ borderTop: '2px solid black' }}>
-        <Button
-          loading={isAdding}
-          disabled={isAdding}
-          onClick={() => formik.handleSubmit()}
-          basic
-          color="blue"
-        >
-          {diagnosis ? 'Rediger' : 'Tilføj'}
-        </Button>
-        {diagnosis && (
+        <Button.Group>
           <Button
             loading={isAdding}
             disabled={isAdding}
-            onClick={() => setEditing(false)}
+            onClick={() => formik.handleSubmit()}
             basic
-            color="orange"
+            color="blue"
           >
-            Annuller redigering
+            {diagnosis ? 'Rediger' : 'Tilføj'}
           </Button>
-        )}
+          {diagnosis && (
+            <Button
+              loading={isAdding}
+              disabled={isAdding}
+              onClick={() => setEditing(false)}
+              basic
+              color="orange"
+            >
+              Annuller redigering
+            </Button>
+          )}
+        </Button.Group>
       </Table.Cell>
     </Table.Row>
   );

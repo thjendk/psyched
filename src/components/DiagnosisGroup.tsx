@@ -13,20 +13,26 @@ const DiagnosisGroup: React.SFC<DiagnosisGroupProps> = () => {
   group = groups.find((g) => group.id === g.id);
 
   return (
-    <li>
-      {group.name}:
-      {group.symptoms.map((s) => (
-        <SymptomTag symptom={s} />
-      ))}
-      <GroupSymptomInput />
+    <div style={{ marginTop: '5px' }}>
+      <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+        {group.name}{' '}
+        {group.symptoms.map((s) => (
+          <div style={{ marginTop: '1em' }}>
+            <SymptomTag symptom={s} />
+          </div>
+        ))}
+        <div style={{ marginTop: '1em' }}>
+          <GroupSymptomInput />
+        </div>
+      </span>
       {group.children.map((c) => (
-        <ul>
+        <div style={{ marginLeft: '1.5em', marginTop: '5px' }}>
           <GroupContext.Provider value={c}>
             <DiagnosisGroup />
           </GroupContext.Provider>
-        </ul>
+        </div>
       ))}
-    </li>
+    </div>
   );
 };
 

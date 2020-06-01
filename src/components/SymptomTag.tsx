@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import Symptom from 'classes/Symptom.class';
-import { Popup, Modal, Icon, Button, Loader } from 'semantic-ui-react';
+import { Popup, Modal, Icon, Button } from 'semantic-ui-react';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import { DiagnosisContext } from './DiagnosisTable';
@@ -14,9 +14,9 @@ export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
   padding: 3px 10px;
   color: ${(props) => (props.active ? 'white' : 'black')};
   margin-left: 5px;
-  margin-top: 5px;
   cursor: pointer;
   border: ${(props) => (props.active ? '1px solid white' : '1px dashed black')};
+  white-space: nowrap;
 
   :hover {
     border: 1px solid black;

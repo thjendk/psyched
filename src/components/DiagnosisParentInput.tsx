@@ -12,7 +12,7 @@ const DiagnosisParentInput: React.SFC<DiagnosisParentInputProps> = ({ diagnosis 
   const [value, setValue] = useState<number>(null);
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
   const diagnosisOptions = diagnoses
-    .filter((d) => diagnosis.parent?.id !== d.id)
+    .filter((d) => diagnosis.parent?.id !== d.id && diagnosis.id !== d.id)
     .map((d) => ({ text: d.name, value: d.id, key: d.id }));
 
   const handleSubmit = async () => {
@@ -21,7 +21,7 @@ const DiagnosisParentInput: React.SFC<DiagnosisParentInputProps> = ({ diagnosis 
 
   return (
     <TagInput
-      placeholder="+ Tilføj lignende"
+      placeholder="+ Tilføj parent"
       handleChange={setValue}
       onSubmit={handleSubmit}
       options={diagnosisOptions}

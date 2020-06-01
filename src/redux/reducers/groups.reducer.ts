@@ -10,7 +10,7 @@ const groupsReducer = createSlice({
   name: 'groups',
   initialState,
   reducers: {
-    addGroups: (state, action: PayloadAction<Group[]>) => {
+    addGroups: (state, action: PayloadAction<Group[] | Group>) => {
       insertOrReplace(state.groups, action.payload);
     }
   }

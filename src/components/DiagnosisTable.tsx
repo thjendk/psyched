@@ -39,7 +39,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
 
     if (numberOfSymptoms(a) < numberOfSymptoms(b)) return 1;
     if (numberOfSymptoms(a) > numberOfSymptoms(b)) return -1;
-    return a.icdCode.localeCompare(b.icdCode);
+    return a.id - b.id;
   };
 
   useEffect(() => {
@@ -66,7 +66,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
             <Table.HeaderCell width={1}>Diagnose</Table.HeaderCell>
             <Table.HeaderCell style={{ width: '70px' }}>ICD-10</Table.HeaderCell>
             <Table.HeaderCell width={4}>Beskrivelse</Table.HeaderCell>
-            <Table.HeaderCell style={{ width: '130px' }}>Fælles</Table.HeaderCell>
+            <Table.HeaderCell>Fælles</Table.HeaderCell>
             <Table.HeaderCell width={1}>Opfyldt</Table.HeaderCell>
             <Table.HeaderCell width={1}>Antal</Table.HeaderCell>
             {user && <Table.HeaderCell width={1}>Muligheder</Table.HeaderCell>}

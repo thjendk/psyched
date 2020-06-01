@@ -53,8 +53,7 @@ export const resolvers: Resolvers = {
   Mutation: {
     createDiagnosis: async (root, { data }, ctx) => {
       const diagnosis = await Diagnoses.query().insertAndFetch({
-        ...data,
-        id: ctx.user.id
+        ...data
       });
       return { id: diagnosis.id };
     },
@@ -72,7 +71,7 @@ export const resolvers: Resolvers = {
       const exists = await Diagnoses.query().findOne({ id, parentId });
 
       if (exists) {
-        await exists.$query().delete();
+        await exists.$query().update({ parentId: null });
       } else {
         await Diagnoses.query()
           .findById(id)

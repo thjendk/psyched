@@ -10,7 +10,7 @@ export const groupTypeDefs = gql`
 
   extend type Mutation {
     addOrRemoveGroup(data: GroupInput): Diagnosis
-    symptomGroup(data: SymptomGroupInput): Diagnosis
+    symptomGroup(data: SymptomGroupInput): Group
   }
 
   type Group {
@@ -54,6 +54,16 @@ export const groupResolvers: Resolvers = {
       }
 
       return { id: data.diagnosisId };
+    },
+    symptomGroup: async (root, { data }, ctx) => {
+      const exists = await SymptomGroup.query().findOne(data);
+      if (exists) {
+        await exists.$query().delete();
+      } else {
+        await SymptomGroup.query().insert(data);
+      }
+
+      return { id: data.groupId };
     }
   },
 

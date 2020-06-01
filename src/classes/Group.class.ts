@@ -39,7 +39,8 @@ class Group {
     `;
 
     try {
-      const diagnosis = await Apollo.mutate<Diagnosis>('createDiagnosis', mutation, { data });
+      const diagnosis = await Apollo.mutate<Diagnosis>('addOrRemoveGroup', mutation, { data });
+      await Group.fetchAll();
       store.dispatch(diagnosisReducer.actions.addDiagnosis(diagnosis));
     } catch (error) {}
   };
@@ -58,7 +59,19 @@ class Group {
     return store.dispatch(groupsReducer.actions.addGroups(groups));
   };
 
-  static addSymptom = async (data: SymptomGroupInput) => {};
+  static addSymptom = async (data: SymptomGroupInput) => {
+    const mutation = gql`
+      mutation SymptomGroup($data: SymptomGroupInput) {
+        symptomGroup(data: $data) {
+          ...Group
+        }
+      }
+      ${Group.fragment}
+    `;
+
+    const group = await Apollo.mutate<Group>('symptomGroup', mutation, { data });
+    store.dispatch(groupsReducer.actions.addGroups(group));
+  };
 }
 
 export default Group;
