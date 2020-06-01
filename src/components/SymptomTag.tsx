@@ -6,6 +6,8 @@ import { ReduxState } from 'redux/reducers';
 import { DiagnosisContext } from './DiagnosisTable';
 import styled from 'styled-components';
 import Group from 'classes/Group.class';
+import { GroupContext } from './DiagnosisSymptomTags';
+import SymptomTagChildren from './SymptomTagChildren';
 
 export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
   border-radius: 5px;
@@ -17,6 +19,7 @@ export const Tag = styled.span<{ active?: boolean; notParent?: boolean }>`
   cursor: pointer;
   border: ${(props) => (props.active ? '1px solid white' : '1px dashed black')};
   white-space: nowrap;
+  display: flex;
 
   :hover {
     border: 1px solid black;
@@ -36,6 +39,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom, style, excess }) => {
   const symptomIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
   const user = useSelector((state: ReduxState) => state.auth.user);
   const diagnosis = useContext(DiagnosisContext);
+  const group = useContext(GroupContext);
 
   const handlePick = (id: number) => {
     Symptom.pick(id);
@@ -43,7 +47,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom, style, excess }) => {
 
   const handleRemoveSymptom = async (id: number) => {
     setRemoveLoading(true);
-    await Group.addSymptom({ groupId: diagnosis.id, symptomId: id });
+    await Group.addOrRemoveSymptom({ groupId: group.id, symptomId: id });
     setModalOpen(false);
     setRemoveLoading(false);
   };
@@ -101,6 +105,7 @@ const SymptomTag: React.SFC<SymptomTagProps> = ({ symptom, style, excess }) => {
               </Modal>
             </>
           )}
+          <SymptomTagChildren parent={symptom} />
         </Tag>
       }
     >

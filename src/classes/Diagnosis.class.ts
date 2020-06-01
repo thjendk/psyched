@@ -28,7 +28,7 @@ class Diagnosis {
           id
         }
       }
-      parent {
+      parents {
         id
       }
       children {

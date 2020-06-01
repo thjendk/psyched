@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Dropdown, Input, Form, Button } from 'semantic-ui-react';
 import Group from 'classes/Group.class';
 import { DiagnosisContext } from './DiagnosisTable';
@@ -31,7 +31,6 @@ const GroupInput: React.SFC<GroupInputProps> = () => {
         parentId: parentId ? Number(parentId) : null
       });
       setName('');
-      setParentId(null);
       setIndex(initialIndex);
     } catch (error) {}
     setLoading(false);

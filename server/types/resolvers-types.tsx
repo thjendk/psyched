@@ -24,7 +24,7 @@ export type Diagnosis = {
   icdCode?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   groups?: Maybe<Array<Maybe<Group>>>;
-  parent?: Maybe<Diagnosis>;
+  parents?: Maybe<Array<Maybe<Diagnosis>>>;
   children?: Maybe<Array<Maybe<Diagnosis>>>;
 };
 
@@ -76,7 +76,7 @@ export type Mutation = {
   updateSymptom?: Maybe<Symptom>;
   removeSymptom?: Maybe<Scalars['Int']>;
   symptomParent?: Maybe<Symptom>;
-  addOrRemoveGroup?: Maybe<Group>;
+  addOrRemoveGroup?: Maybe<Diagnosis>;
   symptomGroup?: Maybe<Group>;
 };
 
@@ -311,7 +311,7 @@ export type DiagnosisResolvers<ContextType = Context, ParentType extends Resolve
   icdCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   groups?: Resolver<Maybe<Array<Maybe<ResolversTypes['Group']>>>, ParentType, ContextType>,
-  parent?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType>,
+  parents?: Resolver<Maybe<Array<Maybe<ResolversTypes['Diagnosis']>>>, ParentType, ContextType>,
   children?: Resolver<Maybe<Array<Maybe<ResolversTypes['Diagnosis']>>>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
@@ -340,7 +340,7 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   updateSymptom?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType, RequireFields<MutationUpdateSymptomArgs, never>>,
   removeSymptom?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType, RequireFields<MutationRemoveSymptomArgs, never>>,
   symptomParent?: Resolver<Maybe<ResolversTypes['Symptom']>, ParentType, ContextType, RequireFields<MutationSymptomParentArgs, never>>,
-  addOrRemoveGroup?: Resolver<Maybe<ResolversTypes['Group']>, ParentType, ContextType, RequireFields<MutationAddOrRemoveGroupArgs, never>>,
+  addOrRemoveGroup?: Resolver<Maybe<ResolversTypes['Diagnosis']>, ParentType, ContextType, RequireFields<MutationAddOrRemoveGroupArgs, never>>,
   symptomGroup?: Resolver<Maybe<ResolversTypes['Group']>, ParentType, ContextType, RequireFields<MutationSymptomGroupArgs, never>>,
 }>;
 

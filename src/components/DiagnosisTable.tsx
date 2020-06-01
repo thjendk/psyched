@@ -3,7 +3,6 @@ import { Table, Input } from 'semantic-ui-react';
 import DiagnosisTableRow from './DiagnosisTableRow';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
-import LoadingPage from './misc/LoadingPage';
 import Diagnosis from 'classes/Diagnosis.class';
 import DiagnosisInputRow from './DiagnosisInputRow';
 import _ from 'lodash';
@@ -26,7 +25,6 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
       ),
     _.isEqual
   );
-  const groups = useSelector((state: ReduxState) => state.groups.groups);
   const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
 
   const sorter = (a: Diagnosis, b: Diagnosis) => {
@@ -39,7 +37,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
 
     if (numberOfSymptoms(a) < numberOfSymptoms(b)) return 1;
     if (numberOfSymptoms(a) > numberOfSymptoms(b)) return -1;
-    return a.id - b.id;
+    return a.icdCode?.localeCompare(b?.icdCode);
   };
 
   useEffect(() => {
@@ -47,7 +45,6 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
     Group.fetchAll();
   }, []);
 
-  if (diagnoses.length === 0 || groups.length === 0) return <LoadingPage />;
   return (
     <div style={{ marginTop: '1em' }}>
       <Table celled size="small">

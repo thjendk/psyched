@@ -19,8 +19,7 @@ const GroupSymptomInput: React.SFC<GroupSymptomInputProps> = () => {
   }));
 
   const handleSubmit = async (symptomId: number) => {
-    console.log('submitting');
-    await Group.addSymptom({ symptomId: symptomId, groupId: group.id });
+    await Group.addOrRemoveSymptom({ symptomId: symptomId, groupId: group.id });
   };
 
   return (

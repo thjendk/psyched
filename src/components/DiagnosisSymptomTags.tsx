@@ -12,29 +12,29 @@ const DiagnosisSymptomTags: React.SFC<DiagnosisSymptomTagsProps> = () => {
   const diagnosis = useContext(DiagnosisContext);
   const diagnoses = useSelector((state: ReduxState) => state.diagnoses.diagnoses);
   const groups = useSelector((state: ReduxState) => state.groups.groups);
-  const parent = diagnoses.find((d) => d.id === diagnosis.parent?.id);
 
   return (
     <div>
-      {parent && (
-        <>
-          <div>
-            <p style={{ margin: 0, fontWeight: 'bold' }}>
-              Generelle kriterier for {parent.name.toLowerCase()}:
-            </p>
-            {parent &&
-              diagnoses
-                .find((d) => parent.id === d.id)
+      {diagnosis.parents
+        .map((p) => diagnoses.find((d) => d.id === p.id))
+        .map((p) => (
+          <>
+            <div>
+              <p style={{ margin: 0, fontWeight: 'bold' }}>
+                Generelle kriterier for {p.icdCode}: {p.name.toLowerCase()}:
+              </p>
+              {diagnoses
+                .find((d) => p.id === d.id)
                 ?.groups.filter((g) => !g.parent)
                 .map((g) => (
                   <GroupContext.Provider value={g}>
                     <DiagnosisGroup />
                   </GroupContext.Provider>
                 ))}
-          </div>
-          <hr />
-        </>
-      )}
+            </div>
+            <hr />
+          </>
+        ))}
       {diagnosis.groups
         .map((g) => groups.find((group) => group.id === g.id))
         .filter((g) => !g.parent)

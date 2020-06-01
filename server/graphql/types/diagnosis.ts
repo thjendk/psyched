@@ -2,6 +2,7 @@ import { gql } from 'apollo-server-express';
 import { Resolvers } from 'types/resolvers-types';
 import Diagnoses from 'models/diagnoses.model';
 import Group from 'models/groups.model';
+import DiagnosisParent from 'models/diagnosisParents.model';
 
 export const typeDefs = gql`
   extend type Query {
@@ -21,7 +22,7 @@ export const typeDefs = gql`
     icdCode: String
     description: String
     groups: [Group]
-    parent: Diagnosis
+    parents: [Diagnosis]
     children: [Diagnosis]
   }
 
@@ -68,14 +69,12 @@ export const resolvers: Resolvers = {
       return id;
     },
     diagnosisParent: async (root, { data: { id, parentId } }, ctx) => {
-      const exists = await Diagnoses.query().findOne({ id, parentId });
+      const exists = await DiagnosisParent.query().findOne({ diagnosisId: id, parentId });
 
       if (exists) {
-        await exists.$query().update({ parentId: null });
+        await exists.$query().delete();
       } else {
-        await Diagnoses.query()
-          .findById(id)
-          .update({ parentId });
+        await DiagnosisParent.query().insert({ diagnosisId: id, parentId });
       }
 
       return { id };
@@ -100,14 +99,13 @@ export const resolvers: Resolvers = {
       const groups = await Group.query().where({ diagnosisId: id });
       return groups.map((g) => ({ id: g.id }));
     },
-    parent: async ({ id }, args, ctx) => {
-      const diagnosis = await ctx.diagnosisLoader.load(id);
-      if (!diagnosis.parentId) return null;
-      return { id: diagnosis.parentId };
+    parents: async ({ id }, args, ctx) => {
+      const parents = await DiagnosisParent.query().where({ diagnosisId: id });
+      return parents.map((p) => ({ id: p.parentId }));
     },
     children: async ({ id }) => {
-      const parents = await Diagnoses.query().where({ parentId: id });
-      return parents.map((p) => ({ id: p.id }));
+      const parents = await DiagnosisParent.query().where({ parentId: id });
+      return parents.map((p) => ({ id: p.diagnosisId }));
     }
   }
 };

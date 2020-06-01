@@ -59,7 +59,7 @@ class Group {
     return store.dispatch(groupsReducer.actions.addGroups(groups));
   };
 
-  static addSymptom = async (data: SymptomGroupInput) => {
+  static addOrRemoveSymptom = async (data: SymptomGroupInput) => {
     const mutation = gql`
       mutation SymptomGroup($data: SymptomGroupInput) {
         symptomGroup(data: $data) {

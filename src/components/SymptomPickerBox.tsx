@@ -29,7 +29,11 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms }) => {
 
   const doesIncludeSearch = (s: Symptom) => {
     s = allSymptoms.find((symp) => symp.id === s.id);
-    if (s.name.includes(search) || s.description.includes(search)) return true;
+    if (
+      s.name.toLowerCase().includes(search.toLowerCase()) ||
+      s.description.toLowerCase().includes(search.toLowerCase())
+    )
+      return true;
     if (s.children.length > 0) return s.children.some((s) => doesIncludeSearch(s));
     return false;
   };

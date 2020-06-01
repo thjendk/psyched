@@ -60,7 +60,7 @@ export const resolvers: Resolvers = {
       const exists = await Symptoms.query().findOne({ id, parentId });
 
       if (exists) {
-        await exists.$query().delete();
+        await exists.$query().update({ parentId: null });
       } else {
         await Symptoms.query()
           .findById(id)

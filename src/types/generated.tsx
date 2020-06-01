@@ -22,7 +22,7 @@ export type Diagnosis = {
   icdCode?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   groups?: Maybe<Array<Maybe<Group>>>;
-  parent?: Maybe<Diagnosis>;
+  parents?: Maybe<Array<Maybe<Diagnosis>>>;
   children?: Maybe<Array<Maybe<Diagnosis>>>;
 };
 
@@ -74,7 +74,7 @@ export type Mutation = {
   updateSymptom?: Maybe<Symptom>;
   removeSymptom?: Maybe<Scalars['Int']>;
   symptomParent?: Maybe<Symptom>;
-  addOrRemoveGroup?: Maybe<Group>;
+  addOrRemoveGroup?: Maybe<Diagnosis>;
   symptomGroup?: Maybe<Group>;
 };
 

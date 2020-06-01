@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Input, Button, TextArea, Form } from 'semantic-ui-react';
+import React, { useState } from 'react';
+import { Button, Form } from 'semantic-ui-react';
 import styled from 'styled-components';
 import Symptom from 'classes/Symptom.class';
 import { useDispatch } from 'react-redux';
 import settingsReducer from 'redux/reducers/settings';
+import _ from 'lodash';
 
 export interface SymptomPickerInputProps {
   setAdding?: Function;
@@ -25,6 +26,12 @@ const SymptomPickerInput: React.SFC<SymptomPickerInputProps> = ({
   const [name, setName] = useState(symptom?.name || '');
   const [description, setDescription] = useState(symptom?.description || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [debouncedSearch] = useState(() =>
+    _.debounce(
+      (value: string) => dispatch(settingsReducer.actions.setSymptomSearchLeft(value)),
+      1000
+    )
+  );
 
   const handleSubmit = async () => {
     if (!name) return setAdding(false);
@@ -33,7 +40,7 @@ const SymptomPickerInput: React.SFC<SymptomPickerInputProps> = ({
       await Symptom.update(symptom.id, { name, description });
       setEditing(false);
     } else {
-      await Symptom.create({ name: name.toLowerCase(), description });
+      await Symptom.create({ name: name, description });
       setName('');
       dispatch(settingsReducer.actions.setSymptomSearchLeft(''));
       setDescription('');
@@ -49,7 +56,9 @@ const SymptomPickerInput: React.SFC<SymptomPickerInputProps> = ({
 
   const handleNameChange = (value: string) => {
     setName(value);
-    dispatch(settingsReducer.actions.setSymptomSearchLeft(value));
+    if (!symptom) {
+      debouncedSearch(value);
+    }
   };
 
   return (

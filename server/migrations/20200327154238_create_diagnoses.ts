@@ -6,11 +6,6 @@ export async function up(knex: Knex): Promise<any> {
     t.text('name');
     t.text('description');
     t.string('icd_code');
-    t.integer('parent_id')
-      .unsigned()
-      .references('diagnoses.id')
-      .onDelete('set null')
-      .onUpdate('cascade');
   });
 }
 

@@ -85,14 +85,14 @@ class Symptom {
   static addOrRemoveParent = async (data: SymptomParentInput) => {
     const mutation = gql`
       mutation SymptomParent($data: SymptomParentInput) {
-        addSymptomParent(data: $data) {
+        symptomParent(data: $data) {
           ...Symptom
         }
       }
       ${Symptom.fragment}
     `;
 
-    const symptom = await Apollo.mutate<Symptom>('addSymptomParent', mutation, { data });
+    const symptom = await Apollo.mutate<Symptom>('symptomParent', mutation, { data });
     store.dispatch(symptomReducer.actions.addSymptom(symptom));
   };
 }

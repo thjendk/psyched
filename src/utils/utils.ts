@@ -5,10 +5,10 @@ import { store } from 'index';
 import _ from 'lodash';
 
 export const colors = {
-  notParent: {
-    color: '#ffdd8f',
-    description: 'Tilhører diagnosen specifikt'
-  },
+  // notParent: {
+  //   color: '#ffdd8f',
+  //   description: 'Tilhører diagnosen specifikt'
+  // },
   active: {
     color: '#0089e0',
     description: 'Er valgt'
@@ -23,6 +23,7 @@ export const groupSymptoms = (g: Group): Symptom[] => {
   const state = store.getState();
 
   g = state.groups.groups.find((group) => group.id === g.id);
+  if (!g) return [];
 
   if (g.children.length === 0) return g.symptoms;
   return _.unionBy(

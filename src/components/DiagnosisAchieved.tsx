@@ -3,7 +3,7 @@ import { DiagnosisContext } from './DiagnosisTable';
 import { useSelector } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import { Icon } from 'semantic-ui-react';
-import { groupSymptoms, diagnosisSymptoms } from 'utils/utils';
+import { diagnosisSymptoms } from 'utils/utils';
 
 export interface DiagnosisAchievedProps {}
 
