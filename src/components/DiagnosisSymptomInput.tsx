@@ -9,6 +9,7 @@ import { GroupContext } from './DiagnosisSymptomTags';
 export interface GroupSymptomInputProps {}
 
 const GroupSymptomInput: React.SFC<GroupSymptomInputProps> = () => {
+  const user = useSelector((state: ReduxState) => state.auth.user);
   const group = useContext(GroupContext);
   const [symptomId, setValue] = useState<number>(null);
   const symptoms = useSelector((state: ReduxState) => state.symptoms.symptoms);
@@ -22,6 +23,7 @@ const GroupSymptomInput: React.SFC<GroupSymptomInputProps> = () => {
     await Group.addOrRemoveSymptom({ symptomId: symptomId, groupId: group.id });
   };
 
+  if (!user) return null;
   return (
     <>
       {group && (

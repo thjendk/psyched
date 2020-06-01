@@ -14,6 +14,7 @@ const DiagnosisGroup: React.SFC<DiagnosisGroupProps> = () => {
   let group = useContext(GroupContext);
   const diagnosis = useContext(DiagnosisContext);
   useSelector((state: ReduxState) => state.symptoms.symptoms);
+  const user = useSelector((state: ReduxState) => state.auth.user);
   const groups = useSelector((state: ReduxState) => state.groups.groups);
   group = groups.find((g) => group.id === g.id);
 
@@ -29,13 +30,15 @@ const DiagnosisGroup: React.SFC<DiagnosisGroupProps> = () => {
   return (
     <div style={{ marginTop: '5px' }}>
       <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-        <Icon
-          name="close"
-          style={{ marginRight: '5px', cursor: 'pointer' }}
-          size="small"
-          onClick={handleRemove}
-          color="grey"
-        />
+        {user && (
+          <Icon
+            name="close"
+            style={{ marginRight: '5px', cursor: 'pointer' }}
+            size="small"
+            onClick={handleRemove}
+            color="grey"
+          />
+        )}
         {group.name}{' '}
         {group.symptoms.map((s) => (
           <div style={{ marginTop: '1em' }}>
