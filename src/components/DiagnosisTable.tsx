@@ -26,6 +26,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
     _.isEqual
   );
   const selectedIds = useSelector((state: ReduxState) => state.symptoms.selectedIds);
+  const groups = useSelector((state: ReduxState) => state.groups.groups);
 
   const sorter = (a: Diagnosis, b: Diagnosis) => {
     const numberOfSymptoms = (d: Diagnosis) => {
@@ -45,6 +46,7 @@ const DiagnosisTable: React.SFC<DiagnosisTableProps> = () => {
     Group.fetchAll();
   }, []);
 
+  if (groups.length === 0) return <p>Loading...</p>;
   return (
     <div style={{ marginTop: '1em' }}>
       <Table celled size="small">
