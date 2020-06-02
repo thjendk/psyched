@@ -20,7 +20,7 @@ const SymptomPicker: React.SFC<SymptomPickerProps> = () => {
 
     setInterval(() => {
       Symptom.fetch();
-    }, 5000);
+    }, 30000);
   }, []);
 
   if (!symptoms) return <LoadingPage />;
