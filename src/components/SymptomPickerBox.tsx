@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { ReduxState } from 'redux/reducers';
 import SymptomPickerRow, { SymptomPickerRowContainer } from './SymptomPickerRow';
 import settingsReducer from 'redux/reducers/settings';
+import symptomReducer from 'redux/reducers/symptoms';
 
 export interface SymptomPickerBoxProps {
   symptoms?: Symptom[];
@@ -38,6 +39,10 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms }) => {
     return false;
   };
 
+  const handleClear = () => {
+    dispatch(symptomReducer.actions.clearSelectedSymptoms());
+  };
+
   const sorter = (a: Symptom, b: Symptom) => {
     return a.name.localeCompare(b.name);
   };
@@ -63,6 +68,9 @@ const SymptomPickerBox: React.SFC<SymptomPickerBoxProps> = ({ symptoms }) => {
               </SymptomPickerRowContainer>
             )
           ))}
+        {!isLeftPicker && (
+          <SymptomPickerRowContainer onClick={handleClear}>Fjern alle</SymptomPickerRowContainer>
+        )}
         {symptoms.sort(sorter).map((s) => (
           <SymptomPickerRow symptom={s} search={search} />
         ))}
